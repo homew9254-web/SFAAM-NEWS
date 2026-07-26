@@ -57,4 +57,4 @@ ENTRYPOINT ["/usr/bin/tini", "--"]
 # IMPORTANT: Use shell form so $PORT is expanded at runtime.
 # Railway injects a random $PORT (e.g. 5432, 8080) — the app MUST listen on it.
 # Using exec form ["uvicorn", ...] would NOT expand $PORT and cause healthcheck to fail.
-CMD uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}
+CMD ["bash", "start.sh"]
