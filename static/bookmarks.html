@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Saved Articles &mdash; SFAAM NEWS</title>
+<meta name="description" content="Your saved articles on SFAAM NEWS. Read them offline anytime, even without an internet connection."/>
+<meta name="robots" content="noindex, follow"/>
+<meta name="theme-color" content="#D97757"/>
+
+<!-- Favicon & PWA -->
+<link rel="icon" type="image/png" href="logo.png"/>
+<link rel="apple-touch-icon" href="logo.png"/>
+<link rel="manifest" href="manifest.json"/>
+<meta name="msapplication-TileColor" content="#D97757"/>
+
+<!-- Preconnect & Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+<!-- Styles -->
+<link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+<a href="#main-content" class="skip-nav">Skip to main content</a>
+<div class="progress-bar" id="readingProgress" role="progressbar" aria-label="Reading progress" aria-valuemin="0" aria-valuemax="100"></div>
+<div id="headerWrap"></div>
+<div id="navWrap"></div>
+<div id="breadcrumbWrap"></div>
+
+<main class="main-content" id="main-content">
+  <section aria-label="Saved Articles">
+    <h2 class="section-title">&#11088; Saved Articles</h2>
+    <p style="color:var(--text-muted);margin-bottom:24px;font-size:15px;">Your bookmarked stories, saved on this device. Read them anytime &mdash; even offline.</p>
+
+    <div class="bookmarks-toolbar" id="bookmarksToolbar" style="display:none;">
+      <div class="bookmarks-count">
+        <span id="bookmarkCountLabel">0 articles saved</span>
+      </div>
+      <div class="bookmarks-actions">
+        <button class="bookmark-action-btn" onclick="exportBookmarks()" title="Download your saved articles as a file">
+          &#128190; Export
+        </button>
+        <button class="bookmark-action-btn bookmark-danger-btn" onclick="clearAllBookmarks()" title="Remove all saved articles">
+          &#128465; Clear All
+        </button>
+      </div>
+    </div>
+
+    <div class="news-grid" id="bookmarksGrid">
+      <div class="news-card skeleton-card" style="grid-column:1/-1;padding:60px;text-align:center;">
+        <div class="loading-spinner" role="status" aria-label="Loading saved articles"></div>
+        <p style="color:var(--text-muted);margin-top:16px;">Loading your saved articles...</p>
+      </div>
+    </div>
+
+    <div id="emptyBookmarks" style="display:none;text-align:center;padding:80px 24px;">
+      <div style="font-size:5rem;margin-bottom:20px;">&#128218;</div>
+      <h2 style="color:var(--white);margin-bottom:12px;font-size:1.8rem;">No Saved Articles Yet</h2>
+      <p style="color:var(--text-muted);margin-bottom:28px;max-width:500px;margin-left:auto;margin-right:auto;">
+        When you save an article by clicking the &ldquo;Save for Later&rdquo; button, it will appear here.
+        Saved articles stay on this device, so you can read them even without an internet connection.
+      </p>
+      <a href="/" style="display:inline-block;padding:14px 32px;background:var(--orange);color:white;border-radius:8px;font-weight:700;text-decoration:none;font-size:15px;">
+        Browse News &rarr;
+      </a>
+    </div>
+  </section>
+</main>
+
+<div id="footerWrap"></div>
+<button class="scroll-top" id="scrollTopBtn" aria-label="Scroll to top">&uarr;</button>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  document.getElementById('headerWrap').innerHTML = buildHeader();
+  document.getElementById('navWrap').innerHTML    = buildNav('bookmarks');
+  document.getElementById('footerWrap').innerHTML = buildFooter();
+  initProgressBar();
+  initScrollTop();
+  document.getElementById('breadcrumbWrap').innerHTML = buildBreadcrumb([
+    {name: 'Home', url: '/'},
+    {name: 'Saved Articles', url: '/bookmarks.html'}
+  ]);
+  await loadBookmarks();
+});
+
+async function loadBookmarks() {
+  const grid = document.getElementById('bookmarksGrid');
+  const empty = document.getElementById('emptyBookmarks');
+  const toolbar = document.getElementById('bookmarksToolbar');
+
+  // V21: Pull bookmarks from localStorage
+  let bookmarkIds = [];
+  try {
+    bookmarkIds = JSON.parse(localStorage.getItem('sfaam_bookmarks') || '[]');
+  } catch (e) {
+    bookmarkIds = [];
+  }
+
+  if (!bookmarkIds.length) {
+    grid.innerHTML = '';
+    grid.style.display = 'none';
+    empty.style.display = 'block';
+    toolbar.style.display = 'none';
+    return;
+  }
+
+  // V21: Fetch each bookmarked article by ID
+  // We do this in parallel — most browsers handle 6+ simultaneous requests
+  const fetches = bookmarkIds.map(id =>
+    fetch(`/api/articles/${id}`).then(r => r.ok ? r.json() : null).catch(() => null)
+  );
+  const results = await Promise.all(fetches);
+  const articles = results.filter(a => a !== null);
+
+  // Articles that were deleted from server but still in localStorage
+  const missingCount = bookmarkIds.length - articles.length;
+  if (missingCount > 0) {
+    // Clean up stale bookmark IDs
+    const validIds = articles.map(a => a.id);
+    localStorage.setItem('sfaam_bookmarks', JSON.stringify(validIds));
+    if (typeof updateBookmarkBadge === 'function') updateBookmarkBadge();
+  }
+
+  if (!articles.length) {
+    grid.innerHTML = '';
+    grid.style.display = 'none';
+    empty.style.display = 'block';
+    toolbar.style.display = 'none';
+    return;
+  }
+
+  // Show toolbar
+  toolbar.style.display = 'flex';
+  document.getElementById('bookmarkCountLabel').textContent =
+    `${articles.length} article${articles.length === 1 ? '' : 's'} saved` +
+    (missingCount > 0 ? ` (${missingCount} no longer available — removed)` : '');
+
+  // Render using the SAME buildNewsCard function used everywhere else,
+  // but add a "Remove" button overlay
+  grid.style.display = '';
+  grid.innerHTML = articles.map(a => buildSavedArticleCard(a)).join('');
+}
+
+// V21: Build a news card with a "Remove from Saved" button
+function buildSavedArticleCard(a) {
+  const imgHtml = a.image_url
+    ? `<div class="news-image-wrap"><img src="/api/imgproxy?url=${encodeURIComponent(a.image_url)}&w=600" alt="${esc(a.title)}" loading="lazy" width="400" height="200" onerror="this.parentElement.innerHTML='<div class=&quot;news-image-ph&quot;>&#128240;</div>'"/><span class="news-badge">${esc((a.region || 'NEWS').toUpperCase())}</span></div>`
+    : `<div class="news-image-ph">&#128240;</div>`;
+  const time = readingTime(a.ai_content || a.summary || '');
+  const dateStr = fmtDateTime(a.date);
+  return `
+    <article class="news-card saved-article-card" onclick="goArticle(${a.id},'${a.slug||''}')" role="link" tabindex="0" onkeydown="if(event.key==='Enter')goArticle(${a.id},'${a.slug||''}')" aria-label="${esc(a.title)}">
+      ${imgHtml}
+      <button class="remove-bookmark-btn" onclick="event.stopPropagation();removeBookmarkFromPage(${a.id})" aria-label="Remove from saved articles" title="Remove from saved">&times;</button>
+      <div class="news-content">
+        <div class="news-category">${esc((a.region || 'NEWS').toUpperCase())} &middot; <time datetime="${a.date}">${dateStr}</time></div>
+        <h3 class="news-title">${esc(a.title)}</h3>
+        <p class="news-excerpt">${esc((a.summary || '').substring(0, 140))}${(a.summary || '').length > 140 ? '...' : ''}</p>
+        <div class="news-meta">
+          <span class="reading-time">${time}</span>
+          <span class="read-more">Read &rarr;</span>
+        </div>
+      </div>
+    </article>`;
+}
+
+function removeBookmarkFromPage(id) {
+  let bm = JSON.parse(localStorage.getItem('sfaam_bookmarks') || '[]');
+  bm = bm.filter(x => x !== id);
+  localStorage.setItem('sfaam_bookmarks', JSON.stringify(bm));
+  if (typeof updateBookmarkBadge === 'function') updateBookmarkBadge();
+  showToast('Removed from saved articles');
+  // Re-render the list
+  loadBookmarks();
+}
+
+function clearAllBookmarks() {
+  let bm = JSON.parse(localStorage.getItem('sfaam_bookmarks') || '[]');
+  if (!bm.length) return;
+  if (!confirm(`Remove all ${bm.length} saved articles? This cannot be undone.`)) return;
+  localStorage.setItem('sfaam_bookmarks', '[]');
+  if (typeof updateBookmarkBadge === 'function') updateBookmarkBadge();
+  showToast('All saved articles cleared');
+  loadBookmarks();
+}
+
+function exportBookmarks() {
+  let bm = JSON.parse(localStorage.getItem('sfaam_bookmarks') || '[]');
+  if (!bm.length) { showToast('No saved articles to export'); return; }
+  const data = {
+    exported_at: new Date().toISOString(),
+    site: 'SFAAM NEWS',
+    bookmark_count: bm.length,
+    bookmark_ids: bm,
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `sfaam-saved-articles-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  showToast('Saved articles exported');
+}
+</script>
+</body>
+</html>

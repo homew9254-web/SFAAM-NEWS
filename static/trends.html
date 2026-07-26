@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Trends &mdash; SFAAM NEWS | Zero-Hallucination Fact-Based Articles</title>
+<meta name="description" content="SFAAM Trends — Wikipedia-style articles auto-generated from the day's top Google searches. Every fact is cross-verified across multiple authoritative news sources. Zero hallucination."/>
+<meta name="robots" content="index, follow"/>
+<meta name="theme-color" content="#D97757"/>
+<meta name="msapplication-TileColor" content="#D97757"/>
+
+<!-- Open Graph -->
+<meta property="og:title" content="Trends — SFAAM NEWS | Zero-Hallucination Fact-Based Articles"/>
+<meta property="og:description" content="Wikipedia-style articles auto-generated from the day's top Google searches. Every fact is cross-verified across multiple authoritative news sources."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://sfaamnews.com/trends.html"/>
+<meta property="og:image" content="https://sfaamnews.com/static/logo.png"/>
+<meta property="og:site_name" content="SFAAM NEWS"/>
+<meta property="og:locale" content="en_US"/>
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:site" content="@sfaamnews"/>
+<meta name="twitter:creator" content="@sfaamnews"/>
+<meta name="twitter:title" content="Trends — SFAAM NEWS | Zero-Hallucination Fact-Based Articles"/>
+<meta name="twitter:description" content="Wikipedia-style articles auto-generated from the day's top Google searches."/>
+<meta name="twitter:image" content="https://sfaamnews.com/static/logo.png"/>
+
+<!-- Favicon & PWA -->
+<link rel="icon" type="image/png" href="logo.png"/>
+<link rel="apple-touch-icon" href="logo.png"/>
+<link rel="manifest" href="manifest.json"/>
+
+<!-- Preconnect & Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@700;800;900&display=swap" rel="stylesheet"/>
+
+<!-- Canonical -->
+<link rel="canonical" href="https://sfaamnews.com/trends.html"/>
+
+<!-- Styles -->
+<link rel="stylesheet" href="css/style.css"/>
+<style>
+  /* === Trends page specific styles === */
+  .trends-hero {
+    background: linear-gradient(135deg, var(--orange-dark) 0%, var(--orange) 50%, var(--orange-light) 100%);
+    padding: 80px 24px 60px;
+    text-align: center;
+    color: #fff;
+    position: relative;
+    overflow: hidden;
+  }
+  .trends-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 60%);
+    animation: pulse 8s ease-in-out infinite;
+  }
+  .trends-hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-weight: 900;
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+    position: relative;
+    z-index: 1;
+  }
+  .trends-hero p {
+    font-size: clamp(1rem, 2.5vw, 1.25rem);
+    max-width: 720px;
+    margin: 0 auto 28px;
+    opacity: 0.95;
+    position: relative;
+    z-index: 1;
+  }
+  .trends-hero .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.18);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.25);
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    position: relative;
+    z-index: 1;
+  }
+  .trends-hero .badge .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 8px #4ade80;
+    animation: blink 2s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .trends-stats-bar {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 24px;
+  }
+  .trends-stats-bar .inner {
+    max-width: var(--max);
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+  }
+  .stat-card {
+    background: var(--bg-2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .stat-card .icon {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    background: rgba(202, 109, 76, 0.15);
+    color: var(--orange);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px;
+  }
+  .stat-card .label { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+  .stat-card .value { font-size: 22px; font-weight: 800; color: var(--text); }
+
+  .trends-container {
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+  .trends-container h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    font-weight: 800;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .trends-container .sub {
+    color: var(--text-muted);
+    font-size: 1.05rem;
+    margin-bottom: 32px;
+  }
+
+  .trends-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 24px;
+  }
+  .trend-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .trend-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--orange);
+    box-shadow: 0 12px 32px rgba(202, 109, 76, 0.18);
+  }
+  .trend-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: linear-gradient(180deg, var(--orange), var(--orange-dark));
+  }
+  .trend-card .meta-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .trend-card .verified-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(74, 222, 128, 0.12);
+    color: #4ade80;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .trend-card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    line-height: 1.3;
+    color: var(--text);
+  }
+  .trend-card p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.55;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .trend-card .footer-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+  .trend-card .word-count {
+    color: var(--orange);
+    font-weight: 700;
+  }
+
+  .trends-empty {
+    text-align: center;
+    padding: 80px 20px;
+    color: var(--text-muted);
+  }
+  .trends-empty .icon { font-size: 64px; opacity: 0.4; margin-bottom: 16px; }
+  .trends-empty h3 { font-size: 1.5rem; color: var(--text); margin-bottom: 8px; }
+  .trends-empty p { font-size: 1rem; max-width: 480px; margin: 0 auto; line-height: 1.6; }
+
+  .trend-loading {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .skeleton-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    height: 220px;
+    position: relative;
+    overflow: hidden;
+  }
+  .skeleton-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.04), transparent);
+    animation: shimmer 1.5s infinite;
+  }
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
+  }
+</style>
+</head>
+<body>
+<a href="#main-content" class="skip-nav">Skip to main content</a>
+<div class="progress-bar" id="readingProgress" role="progressbar" aria-label="Reading progress" aria-valuemin="0" aria-valuemax="100"></div>
+<div id="headerWrap"></div>
+<div id="navWrap"></div>
+
+<section class="trends-hero">
+  <span class="badge"><span class="dot"></span> Zero-Hallucination Content Engine</span>
+  <h1>SFAAM Trends</h1>
+  <p>Wikipedia-style articles auto-generated from the day's top Google searches. Every fact is cross-verified across multiple authoritative news sources — 0% hallucination, 100% facts.</p>
+</section>
+
+<section class="trends-stats-bar">
+  <div class="inner" id="stats-bar">
+    <div class="stat-card">
+      <div class="icon">&#128200;</div>
+      <div><div class="label">Published Trends</div><div class="value" id="stat-total">&mdash;</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="icon">&#128269;</div>
+      <div><div class="label">Sources Per Article</div><div class="value" id="stat-sources">3+</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="icon">&#9989;</div>
+      <div><div class="label">Verified Facts</div><div class="value" id="stat-facts">&mdash;</div></div>
+    </div>
+    <div class="stat-card">
+      <div class="icon">&#9201;</div>
+      <div><div class="label">Refresh Cycle</div><div class="value">6h</div></div>
+    </div>
+  </div>
+</section>
+
+<main class="trends-container" id="main-content">
+  <h2>Latest Trend Articles</h2>
+  <p class="sub">Each article is generated from a trending search query and built using only facts confirmed by 2+ independent authoritative sources.</p>
+
+  <div id="trends-list" class="trends-grid">
+    <!-- Loading skeletons -->
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card"></div>
+    <div class="skeleton-card"></div>
+  </div>
+
+  <div id="trends-empty" class="trends-empty" style="display:none;">
+    <div class="icon">&#128202;</div>
+    <h3>No trends published yet</h3>
+    <p>The Trends pipeline runs every 6 hours. Once articles are drafted by the AI and approved by an editor, they'll appear here. Check back soon!</p>
+  </div>
+
+  <div id="trends-error" class="trends-empty" style="display:none;">
+    <div class="icon">&#9888;</div>
+    <h3>Couldn't load trends</h3>
+    <p id="error-msg">Something went wrong. Please try again later.</p>
+  </div>
+</main>
+
+<div id="footerWrap"></div>
+<button class="scroll-top" id="scrollTopBtn" aria-label="Scroll to top">&uarr;</button>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  document.getElementById('headerWrap').innerHTML = buildHeader();
+  document.getElementById('navWrap').innerHTML    = buildNav('/trends.html');
+  document.getElementById('footerWrap').innerHTML = buildFooter();
+  initProgressBar();
+  initScrollTop();
+
+  const list = document.getElementById('trends-list');
+  const empty = document.getElementById('trends-empty');
+  const errEl = document.getElementById('trends-error');
+  const errMsg = document.getElementById('error-msg');
+
+  try {
+    const res = await fetch('/api/trends?per_page=24');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
+
+    // Stats
+    document.getElementById('stat-total').textContent = data.total || 0;
+
+    // Loading skeletons out
+    list.innerHTML = '';
+
+    if (!data.trends || data.trends.length === 0) {
+      empty.style.display = 'block';
+      return;
+    }
+
+    // Render trend cards
+    for (const t of data.trends) {
+      const card = document.createElement('article');
+      card.className = 'trend-card';
+      card.onclick = () => window.location.href = '/article/' + (t.slug || t.id);
+
+      const date = t.date ? new Date(t.date).toLocaleDateString('en-US', {
+        month: 'short', day: 'numeric', year: 'numeric'
+      }) : '';
+
+      card.innerHTML = `
+        <div class="meta-row">
+          <span class="verified-badge">&#10003; ${t.source_count || 0} Sources</span>
+          <span>${date}</span>
+        </div>
+        <h3>${escapeHtml(t.title)}</h3>
+        <p>${escapeHtml(t.summary || '')}</p>
+        <div class="footer-row">
+          <span>Verified by ${t.source_count || 0} sources</span>
+          <span class="word-count">${(t.word_count || 0).toLocaleString()} words</span>
+        </div>
+      `;
+      list.appendChild(card);
+    }
+
+    // Update "verified facts" stat
+    const avgSources = data.trends.length > 0
+      ? Math.round(data.trends.reduce((s, t) => s + (t.source_count || 0), 0) / data.trends.length)
+      : 0;
+    document.getElementById('stat-facts').textContent = avgSources + ' avg';
+
+  } catch (e) {
+    list.innerHTML = '';
+    errMsg.textContent = e.message || 'Unknown error';
+    errEl.style.display = 'block';
+  }
+
+  function escapeHtml(s) {
+    if (!s) return '';
+    return s.replace(/[&<>"']/g, c => ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+    })[c]);
+  }
+});
+</script>
+</body>
+</html>

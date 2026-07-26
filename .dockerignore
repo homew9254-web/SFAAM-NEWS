@@ -1,0 +1,88 @@
+# ============================================================
+# SFAAM NEWS V30 — .dockerignore
+# ============================================================
+# Files/directories that should NEVER be copied into the Docker
+# image. Critical for security (prevents .env secrets from leaking
+# into the image) and for build performance (smaller image = faster
+# deploy).
+# ------------------------------------------------------------
+
+# ── Secrets & env files (CRITICAL — never ship these) ──
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+secrets/
+credentials.json
+
+# ── Version control ──
+.git
+.gitignore
+.gitattributes
+
+# ── Python caches & build artifacts ──
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# ── Virtual environments ──
+venv/
+.venv/
+env/
+
+# ── Test & coverage artifacts ──
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+
+# ── Editor / IDE config ──
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ── Local dev database (use managed Postgres in production) ──
+*.db
+*.sqlite
+*.sqlite3
+sfaam.db
+
+# ── Logs & runtime data ──
+logs/
+*.log
+
+# ── Documentation (kept in repo, not needed in image) ──
+README.md
+CHANGELOG_*.md
+TRD_IMPLEMENTATION.md
+SCALING_GUIDE.md
+RAILWAY_DEPLOYMENT.md
+
+# ── Test files (not needed in production image) ──
+test_*.py
+tests/
+*_test.py
+
+# ── Dummy preview (dev-only) ──
+static/dummy-article-preview.html
+
+# ── Docker metadata (don't include in image) ──
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# ── Misc project files ──
+.editorconfig
+.pre-commit-config.yaml

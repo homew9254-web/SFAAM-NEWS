@@ -1,0 +1,102 @@
+# ============================================================
+# SFAAM NEWS V26 - Python Dependencies
+# ============================================================
+# All versions pinned for reproducible Railway/Docker builds.
+# Python 3.11+ required (see runtime.txt).
+# ------------------------------------------------------------
+
+# ─── Core Web Framework ─────────────────────────────────────
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+python-multipart==0.0.20
+PyYAML==6.0.2
+
+# ─── Database (PostgreSQL Async) ────────────────────────────
+SQLAlchemy==2.0.36
+asyncpg==0.30.0
+psycopg2-binary==2.9.10
+aiosqlite==0.20.0    # local-dev fallback when DATABASE_URL=sqlite:///
+
+# ─── Redis (rate limiting + session store) ──────────────────
+redis==5.2.1
+hiredis==2.4.0
+
+# ─── Validation & Config ────────────────────────────────────
+pydantic==2.10.4
+pydantic-core==2.27.2
+email-validator==2.2.0
+python-dotenv==1.0.1
+
+# ─── HTTP / Scraping ────────────────────────────────────────
+httpx==0.28.1
+httpcore==1.0.7
+feedparser==6.0.11
+beautifulsoup4==4.12.3
+soupsieve==2.6
+lxml==5.3.0
+lxml_html_clean==0.4.1
+cloudscraper==1.2.71
+requests==2.32.3
+charset-normalizer==3.4.1
+urllib3==2.3.0
+certifi==2024.12.14
+idna==3.10
+
+# ─── Scheduling ─────────────────────────────────────────────
+APScheduler==3.11.0
+tzlocal==5.2
+tzdata==2024.2
+
+# ─── AI Providers ───────────────────────────────────────────
+groq==0.13.1
+google-generativeai==0.8.4
+google-ai-generativelanguage==0.6.15
+google-auth==2.37.0
+google-auth-httplib2==0.2.0
+google-api-python-client==2.156.0
+proto-plus==1.25.0
+protobuf==5.29.2
+grpcio==1.68.1
+grpcio-status==1.68.1
+
+# ─── Optional Monitoring (imported lazily, safe if missing) ─
+sentry-sdk==2.19.2
+
+# ─── V26: Image optimization + TTS narration + async-loop fix ──
+# Pillow: image proxy optimization (V21 imgproxy endpoint) — falls back to raw bytes if missing
+Pillow==11.0.0
+# edge-tts: Microsoft Edge neural TTS (preferred for /api/articles/{id}/narrate)
+edge-tts==6.1.19
+# gTTS: Google Translate TTS fallback (used if edge-tts unavailable)
+gTTS==2.5.4
+# nest_asyncio: allows asyncio.run inside an already-running loop (scheduler.py fallback)
+nest_asyncio==1.6.0
+
+# ─── Utilities ──────────────────────────────────────────────
+anyio==4.7.0
+sniffio==1.3.1
+h11==0.14.0
+click==8.1.8
+typing-extensions==4.12.2
+annotated-types==0.7.0
+six==1.17.0
+
+# ============================================================
+# SFAAM NEWS PRO 1 — Additional dependencies
+# ============================================================
+
+# ─── Web Push notifications (RFC 8291 + VAPID) ──────────────
+# Used by pro_push.py to send breaking-news push notifications
+# to Chrome / Firefox / Edge / Safari 16.4+ subscribers.
+pywebpush==2.0.3
+cryptography==44.0.0
+
+# ─── Email digests ──────────────────────────────────────────
+# pro_digests.py uses stdlib smtplib — no extra dep needed,
+# but we add `emails` for richer email templates later if needed.
+# (commented out — keep install minimal for now)
+# emails==0.6
+
+# ─── Brotp compression (4-5x smaller than gzip) ─────────────
+# Used by Starlette's BrotliMiddleware (installed at app level)
+Brotli==1.1.0

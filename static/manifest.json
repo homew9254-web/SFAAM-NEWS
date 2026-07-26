@@ -1,0 +1,94 @@
+{
+  "id": "/",
+  "name": "SFAAM NEWS PRO — Breaking News, World News & Analysis",
+  "short_name": "SFAAM NEWS",
+  "description": "Trusted journalism from around the world. Breaking news, in-depth analysis, and exclusive reports from USA, UK, Pakistan, India, Germany and beyond.",
+  "start_url": "/?utm_source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "background_color": "#0D0D0D",
+  "theme_color": "#CA6D4C",
+  "orientation": "any",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["news", "magazines", "education"],
+  "prefer_related_applications": false,
+  "icons": [
+    {
+      "src": "/static/logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/logo.png",
+      "sizes": "256x256",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/logo.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/static/images/founder.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "SFAAM NEWS homepage"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Latest News",
+      "short_name": "Latest",
+      "description": "View the latest breaking news",
+      "url": "/?utm_source=pwa_shortcut",
+      "icons": [{ "src": "/static/logo.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Trending",
+      "short_name": "Trending",
+      "description": "View trending topics right now",
+      "url": "/trends.html?utm_source=pwa_shortcut",
+      "icons": [{ "src": "/static/logo.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Bookmarks",
+      "short_name": "Saved",
+      "description": "View your saved articles",
+      "url": "/bookmarks.html?utm_source=pwa_shortcut",
+      "icons": [{ "src": "/static/logo.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Search",
+      "short_name": "Search",
+      "description": "Search SFAAM NEWS",
+      "url": "/search.html?utm_source=pwa_shortcut",
+      "icons": [{ "src": "/static/logo.png", "sizes": "96x96" }]
+    }
+  ],
+  "file_handlers": [],
+  "protocol_handlers": [],
+  "share_target": {
+    "action": "/share-target",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
+}

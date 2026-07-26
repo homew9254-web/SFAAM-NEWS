@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>SFAAM NEWS &mdash; Breaking News, World News &amp; Analysis</title>
+<meta name="description" content="SFAAM NEWS delivers trusted journalism from around the world. Breaking news, in-depth analysis, and exclusive reports from USA, UK, Pakistan, India, Germany and beyond."/>
+<meta name="keywords" content="world news, breaking news, latest news, pakistan news, india news, usa news, uk news, germany news, international news, sfaam news"/>
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"/>
+<meta name="author" content="SFAAM NEWS"/>
+<!-- V32.1: theme-color unified to #CA6D4C (was #D97757, mismatched
+     the CSS var --orange #CA6D4C and the manifest #CA6D4C). Three
+     different values across index.html / manifest.json / style.css
+     caused the mobile browser address bar tint to mismatch the
+     site's brand color, looking like a styling bug. -->
+<meta name="theme-color" content="#CA6D4C"/>
+<meta name="msapplication-TileColor" content="#D97757"/>
+
+<!-- Open Graph -->
+<meta property="og:title" content="SFAAM NEWS &mdash; Breaking News, World News &amp; Analysis"/>
+<meta property="og:description" content="Trusted journalism from around the world. Breaking news, in-depth analysis, and exclusive reports."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://sfaamnews.com"/>
+<meta property="og:image" content="https://sfaamnews.com/static/logo.png"/>
+<meta property="og:image:width" content="256"/>
+<meta property="og:image:height" content="238"/>
+<meta property="og:site_name" content="SFAAM NEWS"/>
+<meta property="og:locale" content="en_US"/>
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:site" content="@sfaamnews"/>
+<meta name="twitter:creator" content="@sfaamnews"/>
+<meta name="twitter:title" content="SFAAM NEWS &mdash; Breaking News &amp; Analysis"/>
+<meta name="twitter:description" content="Trusted journalism from around the world."/>
+<meta name="twitter:image" content="https://sfaamnews.com/static/logo.png"/>
+
+<!-- Favicon & PWA -->
+<link rel="icon" type="image/png" href="logo.png"/>
+<link rel="apple-touch-icon" href="logo.png"/>
+<link rel="manifest" href="manifest.json"/>
+
+<!-- Preconnect & Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+<!-- Canonical -->
+<link rel="canonical" href="https://sfaamnews.com/"/>
+
+<!-- Styles -->
+<link rel="stylesheet" href="css/style.css"/>
+
+<!-- Structured Data -->
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"NewsMediaOrganization","@id":"https://sfaamnews.com/#organization","name":"SFAAM NEWS","url":"https://sfaamnews.com","logo":{"@type":"ImageObject","url":"https://sfaamnews.com/static/logo.png"},"foundingDate":"2024","sameAs":["https://facebook.com/sfaamnews","https://twitter.com/sfaamnews","https://instagram.com/sfaamnews","https://youtube.com/@sfaamnews","https://tiktok.com/@sfaamnews","https://t.me/sfaamnews"]},{"@type":"WebSite","@id":"https://sfaamnews.com/#website","url":"https://sfaamnews.com","name":"SFAAM NEWS","potentialAction":{"@type":"SearchAction","target":{"@type":"EntryPoint","urlTemplate":"https://sfaamnews.com/search.html?q={search_term_string}"},"query-input":"required name=search_term_string"}}]}</script>
+</head>
+<body>
+<a href="#main-content" class="skip-nav">Skip to main content</a>
+<div class="progress-bar" id="readingProgress" role="progressbar" aria-label="Reading progress" aria-valuemin="0" aria-valuemax="100"></div>
+<div id="headerWrap"></div>
+<div id="tickerWrap"></div>
+<div id="navWrap"></div>
+
+<main class="main-content" id="main-content">
+  <!-- Top ad removed as requested - only bottom ad remains -->
+  <section aria-label="Top Story"><div id="heroWrap"></div></section>
+
+  <!-- V32: Live readers social proof bar -->
+  <div id="liveReadersBar" style="display:none;background:linear-gradient(90deg,var(--bg-2),var(--bg-3));padding:10px 16px;border-radius:8px;margin:12px 0;text-align:center;font-size:14px;color:var(--text-muted);">
+    <span style="display:inline-flex;align-items:center;gap:8px;">
+      <span style="width:8px;height:8px;background:#4ade80;border-radius:50%;display:inline-block;animation:pulse 2s infinite;"></span>
+      <span id="liveReadersCount">0</span> readers on SFAAM NEWS right now
+    </span>
+  </div>
+
+  <!-- V32: Editor's Picks — showcase the best journalism -->
+  <section aria-label="Editor's Picks" id="editorsPicksSection" style="display:none;">
+    <h2 class="section-title">&#11088; Editor's Picks</h2>
+    <div class="news-grid" id="editorsPicksGrid"></div>
+  </section>
+
+  <section aria-label="Trending Now">
+    <h2 class="section-title">&#128293; Trending Now</h2>
+    <div class="news-grid" id="trendingGrid"></div>
+  </section>
+
+  <!-- V32: Most Read — by views, last 7 days -->
+  <section aria-label="Most Read" id="mostReadSection" style="display:none;">
+    <h2 class="section-title">&#128064; Most Read This Week</h2>
+    <div class="news-grid" id="mostReadGrid"></div>
+  </section>
+
+  <section aria-label="World News">
+    <h2 class="section-title">&#127757; World News</h2>
+    <div class="news-grid" id="worldGrid"></div>
+  </section>
+
+  <section aria-label="USA News">
+    <h2 class="section-title">&#127482;&#127480; USA News</h2>
+    <div class="news-grid" id="usaGrid"></div>
+  </section>
+
+  <section aria-label="UK News">
+    <h2 class="section-title">&#127468;&#127463; UK News</h2>
+    <div class="news-grid" id="ukGrid"></div>
+  </section>
+
+  <section aria-label="Pakistan News">
+    <h2 class="section-title">&#127477;&#127472; Pakistan News</h2>
+    <div class="news-grid" id="pakGrid"></div>
+  </section>
+
+  <section aria-label="India News">
+    <h2 class="section-title">&#127470;&#127475; India News</h2>
+    <div class="news-grid" id="indiaGrid"></div>
+  </section>
+
+  <section aria-label="Germany News">
+    <h2 class="section-title">&#127465;&#127466; Germany News</h2>
+    <div class="news-grid" id="germanyGrid"></div>
+  </section>
+
+  <div id="adMid"></div>
+
+  <div id="newsletterWrap"></div>
+</main>
+
+<div id="footerWrap"></div>
+<button class="scroll-top" id="scrollTopBtn" aria-label="Scroll to top">&uarr;</button>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+<script src="js/pro-engagement.js" defer></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  document.getElementById('headerWrap').innerHTML = buildHeader();
+  document.getElementById('navWrap').innerHTML    = buildNav('/');
+  document.getElementById('footerWrap').innerHTML = buildFooter();
+  // Only bottom ad remains - top ad removed
+  document.getElementById('adMid').innerHTML      = buildAdWhite();
+  document.getElementById('newsletterWrap').innerHTML = buildNewsletter();
+  loadHero();
+  loadTrending();
+  // V32: New engagement features
+  loadEditorsPicks();
+  loadMostRead();
+  loadLiveReaders();
+  loadSection('world','worldGrid',6);
+  loadSection('usa','usaGrid',6);
+  loadSection('uk','ukGrid',6);
+  loadSection('pakistan','pakGrid',6);
+  loadSection('india','indiaGrid',6);
+  loadSection('germany','germanyGrid',6);
+  // PRO 1: Personalized "For You" feed (appears above region grids
+  // for returning readers, hidden for new visitors)
+  loadForYouFeed();
+});
+
+// PRO 1: Personalized feed
+async function loadForYouFeed() {
+  try {
+    const r = await fetch('/api/personalize/feed?limit=8');
+    const d = await r.json();
+    if (!d.personalized || !d.results || !d.results.length) return;
+    // Inject the For You section above the world grid
+    const worldSection = document.querySelector('section h2');
+    if (!worldSection) return;
+    const section = document.createElement('section');
+    section.style.cssText = 'margin: 32px 0; padding: 24px; background: linear-gradient(135deg, rgba(202,109,76,0.06), rgba(202,109,76,0.02)); border-radius: 16px; border: 1px solid rgba(202,109,76,0.15);';
+    section.innerHTML = `
+      <h2 style="display:flex;align-items:center;gap:8px;font-size:1.6rem;margin-bottom:16px;">
+        <span style="font-size:1.4rem;">&#10024;</span>
+        For You — Based on Your Reading
+        <a href="/reading-history.html" style="font-size:13px;font-weight:400;color:var(--text-muted,#666);margin-left:auto;text-decoration:none;">View your history &rarr;</a>
+      </h2>
+      <div class="news-grid" id="forYouGrid"></div>
+    `;
+    worldSection.closest('section').parentNode.insertBefore(section, worldSection.closest('section'));
+    const grid = section.querySelector('#forYouGrid');
+    d.results.forEach(function (a) {
+      const card = document.createElement('a');
+      card.href = '/article/' + (a.slug || a.id);
+      card.className = 'news-card';
+      card.innerHTML = `
+        ${a.image_url ? '<div class="news-card-img" style="background-image:url(\'' + a.image_url + '\');"></div>' : ''}
+        <div class="news-card-body">
+          <span class="news-tag">${(a.region || 'world').toUpperCase()}</span>
+          <h3>${esc(a.title)}</h3>
+          <p>${esc((a.summary || '').substring(0, 120))}...</p>
+          <div class="news-meta">
+            <span>${a.reason || 'Recommended'}</span>
+          </div>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  } catch (e) { /* silently skip — personalization is non-critical */ }
+}
+
+async function loadHero() {
+  try {
+    const r = await fetch('/api/articles?per_page=5');
+    const arts = await r.json();
+    if (arts.length) {
+      document.getElementById('heroWrap').innerHTML = buildHeroCard(arts[0]);
+      document.getElementById('tickerWrap').innerHTML = buildTicker(arts);
+    }
+  } catch(e) {
+    const demo = getDemoArticles('', 5);
+    document.getElementById('heroWrap').innerHTML = buildHeroCard(demo[0]);
+    document.getElementById('tickerWrap').innerHTML = buildTicker(demo);
+  }
+}
+
+async function loadTrending() {
+  const grid = document.getElementById('trendingGrid');
+  const section = grid.closest('section');
+  try {
+    const r = await fetch('/api/articles/trending?limit=6');
+    const arts = await r.json();
+    if (arts.length) {
+      grid.innerHTML = arts.map(a => buildNewsCard(a)).join('');
+    } else {
+      section.style.display = 'none';
+    }
+  } catch (e) {
+    section.style.display = 'none';
+  }
+}
+
+// V32: Editor's Picks — showcase the best long-form journalism
+async function loadEditorsPicks() {
+  const grid = document.getElementById('editorsPicksGrid');
+  const section = document.getElementById('editorsPicksSection');
+  if (!grid || !section) return;
+  try {
+    const r = await fetch('/api/articles/editors-picks?limit=4');
+    if (!r.ok) { section.style.display = 'none'; return; }
+    const arts = await r.json();
+    if (arts.length >= 2) {
+      grid.innerHTML = arts.map(a => buildNewsCard(a)).join('');
+      section.style.display = 'block';
+    } else {
+      section.style.display = 'none';
+    }
+  } catch (e) {
+    section.style.display = 'none';
+  }
+}
+
+// V32: Most Read — by views, last 7 days
+async function loadMostRead() {
+  const grid = document.getElementById('mostReadGrid');
+  const section = document.getElementById('mostReadSection');
+  if (!grid || !section) return;
+  try {
+    const r = await fetch('/api/articles/most-read?limit=6&days=7');
+    if (!r.ok) { section.style.display = 'none'; return; }
+    const arts = await r.json();
+    if (arts.length >= 2) {
+      grid.innerHTML = arts.map(a => buildNewsCard(a)).join('');
+      section.style.display = 'block';
+    } else {
+      section.style.display = 'none';
+    }
+  } catch (e) {
+    section.style.display = 'none';
+  }
+}
+
+// V32: Live Readers Count — social proof
+async function loadLiveReaders() {
+  const bar = document.getElementById('liveReadersBar');
+  const countEl = document.getElementById('liveReadersCount');
+  if (!bar || !countEl) return;
+  async function update() {
+    try {
+      const r = await fetch('/api/live-readers');
+      if (!r.ok) return;
+      const data = await r.json();
+      if (data.readers > 0) {
+        countEl.textContent = data.readers;
+        bar.style.display = 'block';
+      }
+    } catch (e) { /* silent fail */ }
+  }
+  update();
+  // Update every 60 seconds
+  setInterval(update, 60000);
+}
+
+async function loadSection(region, elId, count) {
+  const grid = document.getElementById(elId);
+  grid.innerHTML = Array(3).fill(0).map(() => buildSkeletonCard()).join('');
+  try {
+    const r = await fetch(`/api/articles?region=${region}&per_page=${count}`);
+    const arts = await r.json();
+    if (arts.length) {
+      grid.innerHTML = arts.map(a => buildNewsCard(a)).join('');
+      const more = document.createElement('div');
+      more.style.cssText = 'text-align:center;margin:8px 0 32px;';
+      // V23: dynamic /category/{name} route (was /{name}-news.html)
+      more.innerHTML = `<a href="/category/${region}" style="display:inline-block;padding:10px 28px;background:var(--orange);color:#fff;border-radius:6px;font-weight:700;font-size:14px;">See All ${region.charAt(0).toUpperCase() + region.slice(1)} News &rarr;</a>`;
+      grid.after(more);
+    } else {
+      grid.innerHTML = `<div class="news-card" style="grid-column:1/-1;padding:40px;text-align:center;"><p style="color:var(--text-muted);">No ${region} news yet. Coming soon!</p></div>`;
+    }
+  } catch(e) {
+    const arts = getDemoArticles(region, count);
+    grid.innerHTML = arts.map(a => buildNewsCard(a)).join('');
+  }
+}
+</script>
+</body>
+</html>

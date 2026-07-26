@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title id="pageTitle">News &mdash; SFAAM NEWS</title>
+<meta name="description" id="pageDescription" content="Latest news from SFAAM NEWS — breaking headlines, in-depth analysis and trusted journalism updated continuously."/>
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"/>
+<meta name="author" content="SFAAM NEWS"/>
+<meta name="theme-color" content="#D97757"/>
+<meta name="msapplication-TileColor" content="#D97757"/>
+
+<!-- Open Graph (server-populated placeholders; JS updates if needed) -->
+<meta property="og:title" id="ogTitle" content="News &mdash; SFAAM NEWS"/>
+<meta property="og:description" id="ogDesc" content="Latest news from SFAAM NEWS."/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" id="ogUrl" content="/"/>
+<meta property="og:image" content="https://sfaamnews.com/static/logo.png"/>
+<meta property="og:site_name" content="SFAAM NEWS"/>
+<meta property="og:locale" content="en_US"/>
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:site" content="@sfaamnews"/>
+<meta name="twitter:creator" content="@sfaamnews"/>
+<meta name="twitter:title" id="twTitle" content="News &mdash; SFAAM NEWS"/>
+<meta name="twitter:description" id="twDesc" content="Latest news from SFAAM NEWS."/>
+<meta name="twitter:image" content="https://sfaamnews.com/static/logo.png"/>
+
+<!-- Favicon & PWA -->
+<link rel="icon" type="image/png" href="/logo.png"/>
+<link rel="apple-touch-icon" href="/logo.png"/>
+<link rel="manifest" href="/manifest.json"/>
+
+<!-- Preconnect & Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+<!-- Canonical (server-side sets this via data-canonical attribute on <html>) -->
+<link rel="canonical" id="canonicalLink" href="/"/>
+
+<!-- Styles -->
+<link rel="stylesheet" href="/css/style.css"/>
+
+<!-- Structured Data (CollectionPage — populated by server template) -->
+<script type="application/ld+json" id="ldjsonSchema">{"@context":"https://schema.org","@type":"CollectionPage","name":"News","url":"/","publisher":{"@type":"NewsMediaOrganization","name":"SFAAM NEWS","url":"https://sfaamnews.com"}}</script>
+</head>
+<body>
+<a href="#main-content" class="skip-nav">Skip to main content</a>
+<div class="progress-bar" id="readingProgress" role="progressbar" aria-label="Reading progress" aria-valuemin="0" aria-valuemax="100"></div>
+<div id="headerWrap"></div>
+<div id="navWrap"></div>
+<div class="region-header">
+  <div class="region-header-inner">
+    <span class="region-flag" id="regionFlag">&#127757;</span>
+    <div>
+      <div class="region-title" id="regionTitle">News</div>
+      <div class="region-sub" id="regionSub">SFAAM NEWS &mdash; Comprehensive coverage</div>
+    </div>
+  </div>
+</div>
+<main class="main-content" id="main-content">
+  <div class="news-grid" id="newsGrid"></div>
+  <div id="adBottom"></div>
+  <div id="newsletterWrap"></div>
+</main>
+<div id="footerWrap"></div>
+<button class="scroll-top" id="scrollTopBtn" aria-label="Scroll to top">&uarr;</button>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="/js/config.js"></script>
+<script src="/js/app.js"></script>
+<script>
+// ════════════════════════════════════════════════════════════
+// V23 DYNAMIC CATEGORY PAGE
+// Reads region from URL: /category/{country_name}
+// All metadata is server-rendered, but JS enhances & loads articles
+// ════════════════════════════════════════════════════════════
+
+const REGION_META = {
+  world:    {flag:'&#127757;',  title:'World News',    sub:'SFAAM NEWS — Comprehensive global coverage'},
+  usa:      {flag:'&#127482;&#127480;', title:'USA News', sub:'SFAAM NEWS — Latest American headlines & analysis'},
+  uk:       {flag:'&#127468;&#127463;', title:'UK News',  sub:'SFAAM NEWS — Britain, Brexit, Parliament & more'},
+  pakistan: {flag:'&#127477;&#127472;', title:'Pakistan News', sub:'SFAAM NEWS — Islamabad, Lahore, Karachi & beyond'},
+  india:    {flag:'&#127470;&#127475;', title:'India News', sub:'SFAAM NEWS — Delhi, Mumbai, Bengaluru & beyond'},
+  germany:  {flag:'&#127465;&#127466;', title:'Germany News', sub:'SFAAM NEWS — Berlin, Munich, Frankfurt & beyond'}
+};
+
+function currentRegion() {
+  // Path: /category/world  →  "world"
+  const parts = window.location.pathname.split('/').filter(Boolean);
+  const idx = parts.indexOf('category');
+  if (idx >= 0 && parts[idx + 1]) {
+    return decodeURIComponent(parts[idx + 1]).toLowerCase();
+  }
+  // fallback to ?region=
+  const q = new URLSearchParams(window.location.search).get('region');
+  return q ? q.toLowerCase() : 'world';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const region = currentRegion();
+  const meta = REGION_META[region] || REGION_META.world;
+  const regionName = meta.title;
+
+  // ── SEO: dynamic meta tags (server already provides, JS fills any gaps) ──
+  document.title = `${regionName} &mdash; SFAAM NEWS | Latest ${regionName}`;
+  document.getElementById('regionFlag').textContent  = '';
+  document.getElementById('regionFlag').innerHTML    = meta.flag;
+  document.getElementById('regionTitle').textContent = regionName;
+  document.getElementById('regionSub').innerHTML     = meta.sub;
+  document.getElementById('pageTitle').textContent   = `${regionName} &mdash; SFAAM NEWS`;
+  document.getElementById('pageDescription').setAttribute('content',
+    `Latest ${regionName} from SFAAM NEWS. Breaking headlines, in-depth analysis and trusted journalism updated continuously.`);
+  document.getElementById('ogTitle').setAttribute('content', `${regionName} &mdash; SFAAM NEWS`);
+  document.getElementById('ogDesc').setAttribute('content',  `Latest ${regionName} updated continuously on SFAAM NEWS.`);
+  document.getElementById('ogUrl').setAttribute('content',   window.location.href);
+  document.getElementById('twTitle').setAttribute('content', regionName + ' — SFAAM NEWS');
+  document.getElementById('twDesc').setAttribute('content',  `Latest ${regionName} from SFAAM NEWS.`);
+  document.getElementById('canonicalLink').setAttribute('href', window.location.href);
+
+  // Breadcrumb schema for SEO
+  const schema = {
+    "@context":"https://schema.org",
+    "@type":"CollectionPage",
+    "name": regionName,
+    "url": window.location.href,
+    "description": `Latest ${regionName} from SFAAM NEWS.`,
+    "isPartOf":{"@type":"WebSite","name":"SFAAM NEWS","url":"https://sfaamnews.com"},
+    "publisher":{"@type":"NewsMediaOrganization","name":"SFAAM NEWS","url":"https://sfaamnews.com","logo":{"@type":"ImageObject","url":"https://sfaamnews.com/static/logo.png"}}
+  };
+  document.getElementById('ldjsonSchema').textContent = JSON.stringify(schema);
+
+  // ── Page chrome ──
+  document.getElementById('headerWrap').innerHTML  = buildHeader();
+  document.getElementById('navWrap').innerHTML     = buildNav(window.location.pathname);
+  document.getElementById('footerWrap').innerHTML  = buildFooter();
+  document.getElementById('adBottom').innerHTML    = buildAdWhite();
+  document.getElementById('newsletterWrap').innerHTML = buildNewsletter();
+
+  // ── Articles: infinite scroll using region from URL ──
+  initInfiniteScroll(region, 'newsGrid');
+});
+</script>
+</body>
+</html>

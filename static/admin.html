@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Admin Panel &mdash; SFAAM NEWS</title>
+<meta name="robots" content="noindex, nofollow"/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta http-equiv="Pragma" content="no-cache"/>
+<meta http-equiv="Expires" content="0"/>
+<meta name="theme-color" content="#D97757"/>
+<link rel="icon" type="image/png" href="logo.png"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/style.css?v=14"/>
+</head>
+<body>
+<noscript><div style="padding:40px;text-align:center;color:#ef4444;font-size:18px;font-family:sans-serif;">JavaScript is required for the Admin Panel. Please enable JavaScript in your browser settings.</div></noscript>
+
+<div id="headerWrap"></div>
+
+<!-- LOGIN BOX -->
+<div class="admin-login" id="loginBox">
+  <h2>&#128274; Admin Login</h2>
+  <p>Enter your admin password to access the dashboard.</p>
+  <form id="loginForm" onsubmit="return handleLoginSubmit(event)">
+    <input type="password" id="adminPass" placeholder="Admin password" autocomplete="current-password" required/>
+    <button type="submit" id="loginBtn">Login &rarr;</button>
+  </form>
+  <p id="loginError" style="color:#ef4444;margin-top:14px;font-size:14px;display:none;">&#10060; Invalid password. Try again.</p>
+  <p id="loginUnconfigured" style="color:#f59e0b;margin-top:14px;font-size:13px;display:none;">&#9888; Admin password not configured on server.</p>
+</div>
+
+<!-- ADMIN PANEL -->
+<div class="admin-panel" id="adminPanel">
+  <h1 style="color:var(--white);margin-bottom:6px;">&#9881; Admin Dashboard</h1>
+  <p style="color:var(--text-muted);margin-bottom:28px;">Manage articles, view analytics, and monitor site health.</p>
+
+  <div class="admin-nav">
+    <button class="active" data-tab="articles">&#128240; Articles</button>
+    <button data-tab="publish">&#9997; Publish</button>
+    <button data-tab="trends">&#128293; Trends Drafts <span id="trendsBadge" style="display:none;background:var(--orange);color:#fff;border-radius:999px;padding:1px 8px;font-size:11px;margin-left:4px;font-weight:700;">0</span></button>
+    <button data-tab="engine">&#9881; News Engine <span id="engineBadge" style="display:none;background:var(--purple,#7c3aed);color:#fff;border-radius:999px;padding:1px 8px;font-size:11px;margin-left:4px;font-weight:700;">0</span></button>
+    <button data-tab="stats">&#128202; Statistics</button>
+    <button data-tab="contacts">&#128172; Messages</button>
+    <button data-tab="system">&#128187; System</button>
+    <button data-tab="comments">&#128172; Comments</button>
+  </div>
+
+  <!-- Articles Tab -->
+  <div id="tab-articles">
+    <div class="admin-stats">
+      <div class="admin-stat"><div class="admin-stat-num" id="statTotal">&mdash;</div><div class="admin-stat-label">Total Articles</div></div>
+      <div class="admin-stat"><div class="admin-stat-num" id="statToday">&mdash;</div><div class="admin-stat-label">Published Today</div></div>
+      <div class="admin-stat"><div class="admin-stat-num" id="statViews">&mdash;</div><div class="admin-stat-label">Total Views</div></div>
+      <div class="admin-stat"><div class="admin-stat-num" id="statSubs">&mdash;</div><div class="admin-stat-label">Subscribers</div></div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="admin-table">
+        <thead>
+          <tr><th>ID</th><th>Title</th><th>Region</th><th>Status</th><th>Date</th><th>Views</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="articlesTable">
+          <tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-muted);">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Publish Tab -->
+  <div id="tab-publish" style="display:none;">
+    <p style="color:var(--text-muted);font-size:14px;margin-bottom:20px;">Write and publish your own article directly to SFAAM NEWS. No AI, no scraping &mdash; this goes live immediately.</p>
+    <div class="form-row">
+      <label for="pTitle">Title *</label>
+      <input type="text" id="pTitle" placeholder="Article headline" maxlength="500"/>
+    </div>
+    <div class="form-row">
+      <label for="pRegion">Region *</label>
+      <select id="pRegion">
+        <option value="world">World</option>
+        <option value="usa">USA</option>
+        <option value="uk">UK</option>
+        <option value="pakistan">Pakistan</option>
+        <option value="india">India</option>
+        <option value="germany">Germany</option>
+      </select>
+    </div>
+    <div class="form-row">
+      <label for="pImage">Image URL</label>
+      <input type="url" id="pImage" placeholder="https://example.com/image.jpg"/>
+    </div>
+    <div class="form-row">
+      <label for="pSummary">Summary <span style="color:var(--text-muted);font-weight:400;">(short 1-2 line preview shown on cards)</span></label>
+      <textarea id="pSummary" placeholder="Short summary..." maxlength="280" style="min-height:70px;"></textarea>
+    </div>
+    <div class="form-row">
+      <label for="pContent">Full Article *</label>
+      <textarea id="pContent" placeholder="Write your full article here. You can use plain text or simple markdown (## headings, **bold**, paragraphs separated by blank lines)." style="min-height:280px;"></textarea>
+    </div>
+    <div class="form-row">
+      <label for="pKeywords">Keywords <span style="color:var(--text-muted);font-weight:400;">(comma separated, optional, helps SEO)</span></label>
+      <input type="text" id="pKeywords" placeholder="e.g. politics, economy, breaking news"/>
+    </div>
+    <button class="btn-submit" id="publishBtn" style="width:auto;padding:14px 32px;display:inline-block;">&#9997; Publish Article</button>
+    <p id="publishStatus" style="color:var(--text-muted);font-size:14px;margin-top:14px;"></p>
+  </div>
+
+  <!-- Stats Tab -->
+  <div id="tab-stats" style="display:none;">
+    <div class="admin-stats">
+      <div class="admin-stat"><div class="admin-stat-num" id="statWorld">&mdash;</div><div class="admin-stat-label">&#127757; World</div></div>
+      <div class="admin-stat"><div class="admin-stat-num" id="statUSA">&mdash;</div><div class="admin-stat-label">&#127482;&#127480; USA</div></div>
+      <div class="admin-stat"><div class="admin-stat-num" id="statUK">&mdash;</div><div class="admin-stat-label">&#127468;&#127463; UK</div></div>
+      <div class="admin-stat"><div class="admin-stat-num" id="statPak">&mdash;</div><div class="admin-stat-label">&#127477;&#127472; Pakistan</div></div>
+      <div class="admin-stat"><div class="admin-stat-num" id="statIndia">&mdash;</div><div class="admin-stat-label">&#127470;&#127475; India</div></div>
+      <div class="admin-stat"><div class="admin-stat-num" id="statGermany">&mdash;</div><div class="admin-stat-label">&#127465;&#127466; Germany</div></div>
+    </div>
+  </div>
+
+  <!-- Contacts Tab -->
+  <div id="tab-contacts" style="display:none;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <p style="color:var(--text-muted);font-size:14px;">Contact messages from readers.</p>
+      <button id="refreshContactsBtn" style="padding:8px 16px;background:var(--bg-3);border:1px solid var(--border);color:var(--text);border-radius:6px;cursor:pointer;font-family:var(--font);font-weight:600;">&#128260; Refresh</button>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="admin-table">
+        <thead>
+          <tr><th>ID</th><th>Name</th><th>Email</th><th>Subject</th><th>Message</th><th>Date</th><th>Status</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="contactsTable">
+          <tr><td colspan="8" style="text-align:center;padding:20px;color:var(--text-muted);">Click Refresh to load messages</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- System Tab -->
+  <div id="tab-system" style="display:none;">
+    <div class="admin-stats">
+      <div class="admin-stat"><div class="admin-stat-num" id="sysStatus">&mdash;</div><div class="admin-stat-label">API Status</div></div>
+      <div class="admin-stat"><div class="admin-stat-num" id="sysVersion">&mdash;</div><div class="admin-stat-label">Version</div></div>
+      <div class="admin-stat"><div class="admin-stat-num" id="sysUptime">&mdash;</div><div class="admin-stat-label">Last Check</div></div>
+    </div>
+    <div style="margin-top:24px;">
+      <h3 style="color:var(--white);margin-bottom:12px;">Quick Actions</h3>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <button class="btn-submit" id="triggerPipelineBtn" style="width:auto;padding:12px 28px;display:inline-block;">&#128260; Run Pipeline Now</button>
+        <button id="checkHealthBtn" style="padding:12px 24px;background:var(--bg-3);border:1px solid var(--border);color:var(--text);border-radius:8px;cursor:pointer;font-family:var(--font);font-weight:600;">&#127775; Check Health</button>
+        <button id="logoutBtn" style="padding:12px 24px;background:transparent;border:1px solid #ef4444;color:#ef4444;border-radius:8px;cursor:pointer;font-family:var(--font);font-weight:600;">&#128682; Logout</button>
+      </div>
+      <p id="pipelineStatus" style="color:var(--text-muted);font-size:14px;margin-top:16px;"></p>
+    </div>
+  </div>
+
+  <!-- Comments Moderation Tab -->
+  <div id="tab-comments" style="display:none;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <p style="color:var(--text-muted);font-size:14px;">Moderate reader comments across all articles.</p>
+      <button id="refreshCommentsBtn" style="padding:8px 16px;background:var(--bg-3);border:1px solid var(--border);color:var(--text);border-radius:6px;cursor:pointer;font-family:var(--font);font-weight:600;">&#128260; Refresh</button>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="admin-table">
+        <thead>
+          <tr><th>ID</th><th>Article</th><th>Name</th><th>Comment</th><th>Date</th><th>Actions</th></tr>
+        </thead>
+        <tbody id="commentsTable">
+          <tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-muted);">Click Refresh to load comments</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Trends Drafts Tab (V26 — Zero-Hallucination Content Engine) -->
+  <div id="tab-trends" style="display:none;">
+    <div class="admin-stats">
+      <div class="admin-stat"><div class="admin-stat-num" id="trendsStatPending">&mdash;</div><div class="admin-stat-label">Drafts Pending</div></div>
+      <div class="admin-stat"><div class="admin-stat-num" id="trendsStatPublished">&mdash;</div><div class="admin-stat-label">Trends Published</div></div>
+      <div class="admin-stat"><div class="admin-stat-num" id="trendsStatRunning">&mdash;</div><div class="admin-stat-label">Pipeline Status</div></div>
+      <div class="admin-stat"><div class="admin-stat-num" id="trendsStatLastRun">&mdash;</div><div class="admin-stat-label">Last Cycle</div></div>
+    </div>
+
+    <div style="background:linear-gradient(135deg, rgba(202,109,76,0.12), rgba(202,109,76,0.04));border:1px solid var(--orange);border-radius:12px;padding:20px 24px;margin:24px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:280px;">
+          <h3 style="color:var(--orange);margin-bottom:8px;font-size:18px;">&#129504; Zero-Hallucination Content Engine</h3>
+          <p style="color:var(--text-muted);font-size:14px;line-height:1.55;margin:0;">
+            Pipeline runs <strong style="color:var(--text);">every 6 hours</strong>: fetches top 7 Google trends → deep-scrapes
+            authoritative news sources → cross-verifies facts across 2+ sources → AI writes Wikipedia-style article
+            using <strong style="color:var(--text);">ONLY</strong> verified facts. All drafts land here for your review.
+          </p>
+          <p id="trendsCurrentQuery" style="color:var(--text-muted);font-size:13px;margin-top:10px;font-style:italic;"></p>
+        </div>
+        <button id="runTrendsBtn" style="padding:12px 24px;background:var(--orange);color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:var(--font);font-weight:700;font-size:14px;white-space:nowrap;">
+          &#9654; Run Trends Now
+        </button>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <p style="color:var(--text-muted);font-size:14px;">Review AI-generated trend articles. <strong style="color:var(--text);">Publish</strong> to make live, or <strong style="color:#ef4444;">Delete</strong> to reject.</p>
+      <button id="refreshTrendsBtn" style="padding:8px 16px;background:var(--bg-3);border:1px solid var(--border);color:var(--text);border-radius:6px;cursor:pointer;font-family:var(--font);font-weight:600;">&#128260; Refresh</button>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Trend Query</th>
+            <th>Sources</th>
+            <th>Facts</th>
+            <th>Words</th>
+            <th>Status</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="trendsTable">
+          <tr><td colspan="8" style="text-align:center;padding:20px;color:var(--text-muted);">Loading trend drafts...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- News Engine Tab (V30 — SFAAM Automated News Engine / TRD v1.0) -->
+  <div id="tab-engine" style="display:none;">
+    <div class="admin-stats">
+      <div class="admin-stat"><div class="admin-stat-num" id="engineStatDrafts">&mdash;</div><div class="admin-stat-label">Drafts Pending</div></div>
+      <div class="admin-stat"><div class="admin-stat-num" id="engineStatPublished">&mdash;</div><div class="admin-stat-label">Published</div></div>
+      <div class="admin-stat"><div class="admin-stat-num" id="engineStatCycles">&mdash;</div><div class="admin-stat-label">Total Cycles</div></div>
+      <div class="admin-stat"><div class="admin-stat-num" id="engineStatLastCycle">&mdash;</div><div class="admin-stat-label">Last Cycle</div></div>
+    </div>
+
+    <div style="background:linear-gradient(135deg, rgba(124,58,237,0.12), rgba(124,58,237,0.04));border:1px solid var(--purple,#7c3aed);border-radius:12px;padding:20px 24px;margin:24px 0;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;">
+        <div style="flex:1;min-width:280px;">
+          <h3 style="color:var(--purple,#7c3aed);margin-bottom:8px;font-size:18px;">&#9881; SFAAM Automated News Engine (TRD v1.0)</h3>
+          <p style="color:var(--text-muted);font-size:14px;line-height:1.55;margin:0;">
+            Pipeline runs <strong style="color:var(--text);">every 3 hours</strong> across <strong style="color:var(--text);">6 regions</strong>
+            (World, USA, UK, Pakistan, India, Germany) — each with isolated Groq + Gemini keys. For every region:
+            detects top viral trend → scrapes 3-5 authoritative sources → cross-verifies facts (safety shield drops
+            single-source claims) → dynamically sizes article (400-2500+ words based on fact pool) → saves as
+            <strong style="color:var(--text);">DRAFT</strong> for your editorial sign-off.
+          </p>
+          <p id="engineCurrentRegion" style="color:var(--text-muted);font-size:13px;margin-top:10px;font-style:italic;"></p>
+          <div id="engineProviderHealth" style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;"></div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button id="runEngineBtn" style="padding:12px 24px;background:var(--purple,#7c3aed);color:#fff;border:none;border-radius:8px;cursor:pointer;font-family:var(--font);font-weight:700;font-size:14px;white-space:nowrap;">
+            &#9654; Run Full Cycle (All Regions)
+          </button>
+          <select id="engineSingleRegion" style="padding:8px 12px;background:var(--bg-3);border:1px solid var(--border);color:var(--text);border-radius:6px;font-family:var(--font);font-size:13px;">
+            <option value="">— Or run single region —</option>
+            <option value="world">World</option>
+            <option value="usa">USA</option>
+            <option value="uk">UK</option>
+            <option value="pakistan">Pakistan</option>
+            <option value="india">India</option>
+            <option value="germany">Germany</option>
+          </select>
+          <button id="runEngineRegionBtn" style="padding:8px 16px;background:var(--bg-3);border:1px solid var(--purple,#7c3aed);color:var(--purple,#7c3aed);border-radius:6px;cursor:pointer;font-family:var(--font);font-weight:600;font-size:13px;">
+            Run Single Region
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <p style="color:var(--text-muted);font-size:14px;">
+        Review V30 engine drafts. <strong style="color:var(--text);">Publish</strong> the top 5 masterpieces per day (per TRD).
+        &nbsp;|&nbsp; Filter by region:
+        <select id="engineRegionFilter" style="padding:4px 8px;background:var(--bg-3);border:1px solid var(--border);color:var(--text);border-radius:4px;font-family:var(--font);font-size:13px;margin-left:6px;">
+          <option value="">All Regions</option>
+          <option value="world">World</option>
+          <option value="usa">USA</option>
+          <option value="uk">UK</option>
+          <option value="pakistan">Pakistan</option>
+          <option value="india">India</option>
+          <option value="germany">Germany</option>
+        </select>
+      </p>
+      <button id="refreshEngineBtn" style="padding:8px 16px;background:var(--bg-3);border:1px solid var(--border);color:var(--text);border-radius:6px;cursor:pointer;font-family:var(--font);font-weight:600;">&#128260; Refresh</button>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title / Trend</th>
+            <th>Region</th>
+            <th>Tier</th>
+            <th>Words</th>
+            <th>Sources</th>
+            <th>Facts (raw/verified)</th>
+            <th>Provider</th>
+            <th>Trend Score</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="engineTable">
+          <tr><td colspan="11" style="text-align:center;padding:20px;color:var(--text-muted);">Loading engine drafts...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 style="color:var(--white);margin-top:36px;margin-bottom:12px;font-size:16px;">&#128197; Recent Cycle History</h3>
+    <div style="overflow-x:auto;">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>Cycle ID</th>
+            <th>Started</th>
+            <th>Duration</th>
+            <th>Regions</th>
+            <th>Drafts</th>
+            <th>Failed</th>
+            <th>Dedup Skips</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="engineCyclesTable">
+          <tr><td colspan="8" style="text-align:center;padding:20px;color:var(--text-muted);">Loading cycle history...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Trend Draft Detail Modal -->
+  <div id="trendModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:9999;overflow:auto;padding:20px;">
+    <div style="background:var(--bg-2);max-width:900px;margin:40px auto;border-radius:16px;border:1px solid var(--border);overflow:hidden;">
+      <div style="padding:20px 24px;background:var(--card);border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+        <h3 id="trendModalTitle" style="color:var(--white);margin:0;font-size:18px;">Trend Draft Detail</h3>
+        <button onclick="document.getElementById('trendModal').style.display='none'" style="background:transparent;border:none;color:var(--text-muted);font-size:24px;cursor:pointer;">&times;</button>
+      </div>
+      <div id="trendModalBody" style="padding:24px;max-height:70vh;overflow:auto;">
+        <p style="color:var(--text-muted);">Loading...</p>
+      </div>
+      <div id="trendModalActions" style="padding:16px 24px;background:var(--card);border-top:1px solid var(--border);display:flex;gap:12px;justify-content:flex-end;">
+        <!-- Filled dynamically -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!--
+  ════════════════════════════════════════════════════════════
+  ADMIN PANEL V14 — COMPLETELY SELF-CONTAINED
+  No dependency on app.js or config.js.
+  All functions defined inline. Event listeners attached
+  via addEventListener (not inline onclick) for reliability.
+  ════════════════════════════════════════════════════════════
+-->
+<script>
+(function() {
+  'use strict';
+
+  // ── Session token + CSRF token (V26 FIX: CSRF was previously dropped, breaking all admin POST/DELETE) ──
+  let _adminToken = null;
+  let _csrfToken = null;
+  try { _adminToken = sessionStorage.getItem('sfaam_admin'); } catch(e) {}
+  try { _csrfToken = sessionStorage.getItem('sfaam_admin_csrf'); } catch(e) {}
+
+  // ── Utility: HTML escape (XSS protection) ──
+  function esc(s) {
+    if (s == null) return '';
+    var div = document.createElement('div');
+    div.textContent = String(s);
+    return div.innerHTML;
+  }
+
+  // ── Utility: Format date ──
+  function fmtDate(d) {
+    if (!d) return '';
+    try {
+      return new Date(d).toLocaleDateString('en-US', {
+        day: 'numeric', month: 'short', year: 'numeric'
+      });
+    } catch (e) { return String(d); }
+  }
+
+  // ── Utility: Format date/time with relative ──
+  function fmtDateTime(d) {
+    if (!d) return '';
+    try {
+      var date = new Date(d);
+      var now = new Date();
+      var diff = Math.floor((now - date) / 1000);
+      if (diff < 60) return 'Just now';
+      if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+      if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+      if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+      return date.toLocaleDateString('en-US', {
+        day: 'numeric', month: 'short', year: 'numeric'
+      });
+    } catch (e) { return String(d); }
+  }
+
+  // ── Utility: Toast notification ──
+  function showToast(msg) {
+    var t = document.getElementById('toast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'toast';
+      t.className = 'toast';
+      t.setAttribute('role', 'status');
+      document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(function() { t.classList.remove('show'); }, 3500);
+  }
+
+  // ── Build simple header (no external dependency) ──
+  function buildHeader() {
+    return '<header class="header"><div class="header-top"><div class="logo-section">'
+      + '<a href="/"><img src="logo.png" alt="SFAAM NEWS" class="logo-img" width="44" height="44"/></a>'
+      + '<a href="/"><div class="logo-text">SFAAM NEWS</div></a>'
+      + '</div></div></header>';
+  }
+
+  // ══════════════════════════════════════
+  //  LOGIN
+  // ══════════════════════════════════════
+  function handleLoginSubmit(e) {
+    e.preventDefault();
+    doLogin();
+    return false;
+  }
+
+  async function doLogin() {
+    var passEl = document.getElementById('adminPass');
+    var errEl = document.getElementById('loginError');
+    var unconfEl = document.getElementById('loginUnconfigured');
+    var btnEl = document.getElementById('loginBtn');
+    var pass = passEl ? passEl.value : '';
+
+    if (!pass) {
+      errEl.textContent = '\u274C Please enter a password';
+      errEl.style.display = 'block';
+      return;
+    }
+
+    errEl.style.display = 'none';
+    unconfEl.style.display = 'none';
+    if (btnEl) { btnEl.disabled = true; btnEl.textContent = 'Logging in...'; }
+
+    try {
+      var r = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ password: pass })
+      });
+      var d = await r.json();
+      if (r.ok && d.token) {
+        try { sessionStorage.setItem('sfaam_admin', d.token); } catch(e) {}
+        _adminToken = d.token;
+        // V26 FIX: store CSRF token — required for all admin POST/PUT/PATCH/DELETE
+        if (d.csrf_token) {
+          _csrfToken = d.csrf_token;
+          try { sessionStorage.setItem('sfaam_admin_csrf', d.csrf_token); } catch(e) {}
+        }
+        showPanel();
+      } else if (r.status === 500) {
+        unconfEl.style.display = 'block';
+      } else {
+        errEl.textContent = '\u274C ' + (d.detail || 'Invalid password');
+        errEl.style.display = 'block';
+      }
+    } catch (e) {
+      errEl.textContent = '\u274C Cannot reach server. Check your connection.';
+      errEl.style.display = 'block';
+    } finally {
+      if (btnEl) { btnEl.disabled = false; btnEl.textContent = 'Login \u2192'; }
+    }
+  }
+
+  // ══════════════════════════════════════
+  //  SESSION
+  // ══════════════════════════════════════
+  async function verifySession() {
+    if (!_adminToken) return;
+    try {
+      var r = await fetch('/api/admin/verify', {
+        headers: { 'X-Admin-Session': _adminToken }
+      });
+      if (r.ok) {
+        // V26 FIX: refresh CSRF token on every verify (server rotates it hourly)
+        var d = await r.json().catch(() => ({}));
+        if (d.csrf_token) {
+          _csrfToken = d.csrf_token;
+          try { sessionStorage.setItem('sfaam_admin_csrf', d.csrf_token); } catch(e) {}
+        }
+        showPanel();
+      } else {
+        try { sessionStorage.removeItem('sfaam_admin'); } catch(e) {}
+        try { sessionStorage.removeItem('sfaam_admin_csrf'); } catch(e) {}
+        _adminToken = null;
+        _csrfToken = null;
+      }
+    } catch (e) {
+      try { sessionStorage.removeItem('sfaam_admin'); } catch(e) {}
+      try { sessionStorage.removeItem('sfaam_admin_csrf'); } catch(e) {}
+      _adminToken = null;
+      _csrfToken = null;
+    }
+  }
+
+  function doLogout() {
+    try { sessionStorage.removeItem('sfaam_admin'); } catch(e) {}
+    try { sessionStorage.removeItem('sfaam_admin_csrf'); } catch(e) {}
+    _adminToken = null;
+    _csrfToken = null;
+    document.getElementById('adminPanel').style.display = 'none';
+    document.getElementById('loginBox').style.display = 'block';
+    document.getElementById('adminPass').value = '';
+    document.getElementById('loginError').style.display = 'none';
+  }
+
+  function showPanel() {
+    document.getElementById('loginBox').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    loadStats();
+    loadArticles();
+    checkHealth();
+  }
+
+  // ══════════════════════════════════════
+  //  TABS
+  // ══════════════════════════════════════
+  var TABS = ['articles', 'publish', 'trends', 'engine', 'stats', 'contacts', 'system', 'comments'];
+
+  function showTab(tab, btn) {
+    document.querySelectorAll('.admin-nav button').forEach(function(b) { b.classList.remove('active'); });
+    if (btn) btn.classList.add('active');
+    TABS.forEach(function(t) {
+      var el = document.getElementById('tab-' + t);
+      if (el) el.style.display = t === tab ? 'block' : 'none';
+    });
+    if (tab === 'stats') loadStats();
+    if (tab === 'contacts') loadContacts();
+    if (tab === 'system') checkHealth();
+    if (tab === 'comments') loadAllComments();
+    if (tab === 'trends') loadTrendsDrafts();
+    if (tab === 'engine') loadEngineDashboard();
+  }
+
+  // ══════════════════════════════════════
+  //  STATS
+  // ══════════════════════════════════════
+  async function loadStats() {
+    try {
+      var r = await fetch('/api/stats');
+      var s = await r.json();
+      function set(id, val) { var el = document.getElementById(id); if (el) el.textContent = val; }
+      set('statTotal', (s.total || 0).toLocaleString());
+      set('statToday', s.today || 0);
+      set('statViews', (s.total_views || 0).toLocaleString());
+      set('statSubs', (s.subscribers || 0).toLocaleString());
+      set('statWorld', (s.by_region && s.by_region.world) || 0);
+      set('statUSA', (s.by_region && s.by_region.usa) || 0);
+      set('statUK', (s.by_region && s.by_region.uk) || 0);
+      set('statPak', (s.by_region && s.by_region.pakistan) || 0);
+      set('statIndia', (s.by_region && s.by_region.india) || 0);
+      set('statGermany', (s.by_region && s.by_region.germany) || 0);
+    } catch (e) { console.error('Stats error:', e); }
+  }
+
+  // ══════════════════════════════════════
+  //  ARTICLES
+  // ══════════════════════════════════════
+  async function loadArticles() {
+    try {
+      // Fetch both published articles AND drafts (admin sees everything)
+      var [pubRes, draftRes] = await Promise.all([
+        fetch('/api/articles?per_page=100'),
+        fetch('/api/admin/drafts?status=all&per_page=100', { headers: adminHeaders() }).catch(function() { return { ok: false, json: function() { return Promise.resolve([]); } }; })
+      ]);
+      var pubArts = await pubRes.json();
+      var draftArts = draftRes.ok ? await draftRes.json() : [];
+      // Merge and deduplicate by id
+      var seen = {};
+      var allArts = [];
+      pubArts.forEach(function(a) { if (!seen[a.id]) { seen[a.id] = true; a._status = a.status || 'published'; allArts.push(a); } });
+      draftArts.forEach(function(a) { if (!seen[a.id]) { seen[a.id] = true; a._status = a.status || 'draft'; allArts.push(a); } });
+      // Sort by date desc
+      allArts.sort(function(a, b) { return (b.date || '').localeCompare(a.date || ''); });
+
+      if (!allArts.length) {
+        document.getElementById('articlesTable').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text-muted);">No articles yet. Click "Trigger Pipeline" in System tab or wait for auto-scraper.</td></tr>';
+        return;
+      }
+      document.getElementById('articlesTable').innerHTML = allArts.map(function(a) {
+        var st = a._status || a.status || 'published';
+        var stColor = st === 'published' ? '#4ade80' : st === 'draft' ? '#facc15' : '#f87171';
+        var stLabel = st === 'published' ? 'Published' : st === 'draft' ? 'Draft' : st === 'pending_review' ? 'Review' : st;
+        return '<tr>'
+          + '<td>' + a.id + '</td>'
+          + '<td title="' + esc(a.title) + '">' + esc(a.title.substring(0, 45)) + (a.title.length > 45 ? '\u2026' : '') + '</td>'
+          + '<td>' + esc(a.region) + '</td>'
+          + '<td><span style="background:' + stColor + ';color:#000;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;">' + stLabel + '</span></td>'
+          + '<td>' + fmtDate(a.date) + '</td>'
+          + '<td>' + (a.views || 0).toLocaleString() + '</td>'
+          + '<td style="display:flex;gap:6px;padding:8px 12px;flex-wrap:wrap;">'
+          + '<a href="/article/' + (a.slug || a.id) + '" target="_blank" class="admin-btn admin-btn-view">View</a>'
+          + (st !== 'published' ? '<button class="admin-btn admin-btn-pub" data-publish-article="' + a.id + '" style="background:#4ade80;color:#000;">Publish</button>' : '')
+          + '<button class="admin-btn admin-btn-edit" data-edit-article="' + a.id + '" style="background:#60a5fa;color:#000;">Edit</button>'
+          + '<button class="admin-btn admin-btn-del" data-delete-article="' + a.id + '">Delete</button>'
+          + '</td></tr>';
+      }).join('');
+    } catch (e) {
+      console.error('loadArticles error:', e);
+      document.getElementById('articlesTable').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text-muted);">Failed to load articles. ' + esc(e.message || '') + '</td></tr>';
+    }
+  }
+
+  // ══════════════════════════════════════
+  //  CONTACTS
+  // ══════════════════════════════════════
+  async function loadContacts() {
+    var tbody = document.getElementById('contactsTable');
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--text-muted);">Loading...</td></tr>';
+    try {
+      var r = await fetch('/api/admin/contacts', {
+        headers: { 'X-Admin-Session': _adminToken || '' }
+      });
+      if (!r.ok) throw new Error('Unauthorized');
+      var msgs = await r.json();
+      if (!msgs.length) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--text-muted);">No messages yet.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = msgs.map(function(m) {
+        return '<tr style="' + (m.read ? '' : 'background:rgba(217,119,87,0.05);') + '">'
+          + '<td>' + m.id + '</td>'
+          + '<td>' + esc(m.name) + '</td>'
+          + '<td><a href="mailto:' + esc(m.email) + '" style="color:var(--orange);">' + esc(m.email) + '</a></td>'
+          + '<td>' + esc(m.subject || 'No Subject') + '</td>'
+          + '<td>' + esc(m.message.substring(0, 80)) + (m.message.length > 80 ? '\u2026' : '') + '</td>'
+          + '<td>' + fmtDate(m.sent_at) + '</td>'
+          + '<td>' + (m.read ? '<span style="color:#4ade80;">&#10003; Read</span>' : '<span style="color:var(--orange);">&#9679; New</span>') + '</td>'
+          + '<td>' + (!m.read ? '<button class="admin-btn admin-btn-read" data-mark-read="' + m.id + '">Mark Read</button>' : '') + '</td>'
+          + '</tr>';
+      }).join('');
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--text-muted);">Failed to load messages.</td></tr>';
+    }
+  }
+
+  async function markRead(msgId) {
+    try {
+      var r = await fetch('/api/admin/contacts/' + msgId + '/read', {
+        method: 'POST',
+        headers: adminHeaders()
+      });
+      if (r.ok) { showToast('Marked as read'); loadContacts(); }
+    } catch (e) { showToast('Failed to mark as read'); }
+  }
+
+  // ══════════════════════════════════════
+  //  DELETE ARTICLE
+  // ══════════════════════════════════════
+  async function deleteArticle(id) {
+    if (!confirm('Delete article #' + id + '? This cannot be undone.')) return;
+    var adminKey = prompt('Enter admin key to confirm:');
+    if (!adminKey) return;
+    try {
+      var h = adminHeaders();
+      h['X-Admin-Key'] = adminKey;  // extra auth for destructive action
+      var r = await fetch('/api/articles/' + id, {
+        method: 'DELETE',
+        headers: h
+      });
+      if (r.ok) { showToast('Article deleted'); loadArticles(); loadStats(); }
+      else { var d = await r.json(); showToast(d.detail || 'Failed to delete'); }
+    } catch (e) { showToast('Error: ' + e.message); }
+  }
+
+  // ══════════════════════════════════════
+  //  PUBLISH DRAFT (from Articles tab)
+  // ══════════════════════════════════════
+  async function publishDraft(id) {
+    if (!confirm('Publish article #' + id + '? This will make it visible to the public.')) return;
+    try {
+      var r = await fetch('/api/admin/articles/' + id + '/publish', {
+        method: 'POST',
+        headers: adminHeaders()
+      });
+      if (r.ok) { showToast('Article published!'); loadArticles(); loadStats(); }
+      else { var d = await r.json(); showToast(d.detail || 'Failed to publish'); }
+    } catch (e) { showToast('Error: ' + e.message); }
+  }
+
+  // ══════════════════════════════════════
+  //  PUBLISH ARTICLE
+  // ══════════════════════════════════════
+  async function publishArticle() {
+    var title = document.getElementById('pTitle').value.trim();
+    var region = document.getElementById('pRegion').value;
+    var content = document.getElementById('pContent').value.trim();
+    var summary = document.getElementById('pSummary').value.trim();
+    var image_url = document.getElementById('pImage').value.trim();
+    var keywords = document.getElementById('pKeywords').value.trim();
+    var statusEl = document.getElementById('publishStatus');
+
+    if (title.length < 5) { statusEl.style.color = '#ef4444'; statusEl.textContent = 'Title must be at least 5 characters.'; return; }
+    if (content.length < 50) { statusEl.style.color = '#ef4444'; statusEl.textContent = 'Article content must be at least 50 characters.'; return; }
+
+    statusEl.style.color = 'var(--text-muted)';
+    statusEl.textContent = 'Publishing...';
+
+    try {
+      var h = adminHeaders();
+      h['Content-Type'] = 'application/json';
+      var r = await fetch('/api/admin/articles', {
+        method: 'POST',
+        headers: h,
+        body: JSON.stringify({ title: title, region: region, content: content, summary: summary, image_url: image_url, keywords: keywords })
+      });
+      var d = await r.json();
+      if (r.ok) {
+        statusEl.style.color = '#22c55e';
+        statusEl.textContent = 'Published! "' + d.title + '" is now live.';
+        showToast('Article published successfully');
+        ['pTitle', 'pImage', 'pSummary', 'pContent', 'pKeywords'].forEach(function(id) { document.getElementById(id).value = ''; });
+        loadStats();
+      } else {
+        statusEl.style.color = '#ef4444';
+        statusEl.textContent = d.detail || 'Failed to publish. Make sure you are logged in.';
+      }
+    } catch (e) {
+      statusEl.style.color = '#ef4444';
+      statusEl.textContent = 'Error: ' + e.message;
+    }
+  }
+
+  // ══════════════════════════════════════
+  //  PIPELINE
+  // ══════════════════════════════════════
+  async function triggerPipeline() {
+    var st = document.getElementById('pipelineStatus');
+    st.textContent = '\u23F3 Starting pipeline...';
+    st.style.color = 'var(--text-muted)';
+    try {
+      var r = await fetch('/api/trigger', {
+        method: 'POST',
+        headers: adminHeaders()
+      });
+      var d = await r.json();
+      if (!r.ok) {
+        st.style.color = '#ef4444';
+        st.textContent = '\u274C ' + (d.detail || 'Error ' + r.status)
+          + (r.status === 403 ? ' \u2014 session expired, log out and log back in.' : '');
+        return;
+      }
+      st.style.color = 'var(--orange)';
+      st.textContent = '\u23F3 Pipeline started. Checking status...';
+      _pollPipelineStatus();
+    } catch (e) {
+      st.style.color = '#ef4444';
+      st.textContent = '\u274C Error starting pipeline: ' + e.message;
+    }
+  }
+
+  function _pollPipelineStatus() {
+    var st = document.getElementById('pipelineStatus');
+    var attempts = 0;
+    var maxAttempts = 60;
+
+    var poll = async function() {
+      attempts++;
+      if (attempts > maxAttempts) {
+        st.style.color = '#f59e0b';
+        st.textContent = '\u26A0 Pipeline still running (check logs). Max poll time reached.';
+        return;
+      }
+      try {
+        var r = await fetch('/api/pipeline-status', {
+          headers: { 'X-Admin-Session': _adminToken || '' }
+        });
+        if (!r.ok) {
+          st.style.color = '#ef4444';
+          st.textContent = '\u274C Cannot check pipeline status (auth error)';
+          return;
+        }
+        var d = await r.json();
+        if (!d.running) {
+          if (d.last_error) {
+            st.style.color = '#ef4444';
+            st.textContent = '\u274C Pipeline failed: ' + d.last_error.substring(0, 150);
+          } else if (d.saved === 0 && d.failed === 0 && d.skipped === 0) {
+            st.style.color = '#f59e0b';
+            st.textContent = '\u26A0 Pipeline completed but found 0 new articles.';
+          } else {
+            st.style.color = '#4ade80';
+            st.textContent = '\u2705 Pipeline complete! ' + d.saved + ' saved, ' + d.failed + ' failed, ' + d.skipped + ' skipped.';
+            loadArticles();
+            loadStats();
+          }
+          return;
+        }
+        st.style.color = 'var(--orange)';
+        st.textContent = '\u23F3 Pipeline running... (saved: ' + (d.saved || 0) + ', failed: ' + (d.failed || 0) + ') [' + attempts + '/' + maxAttempts + ']';
+        setTimeout(poll, 5000);
+      } catch (e) {
+        st.style.color = '#f59e0b';
+        st.textContent = '\u26A0 Error polling status. Pipeline may still be running.';
+      }
+    };
+    setTimeout(poll, 3000);
+  }
+
+  // ══════════════════════════════════════
+  //  HEALTH CHECK
+  // ══════════════════════════════════════
+  async function checkHealth() {
+    try {
+      var r = await fetch('/health');
+      var d = await r.json();
+      document.getElementById('sysStatus').textContent = '\u2705';
+      document.getElementById('sysStatus').style.color = '#4ade80';
+      document.getElementById('sysVersion').textContent = d.version || '14.0';
+      document.getElementById('sysUptime').textContent = new Date().toLocaleTimeString();
+    } catch (e) {
+      document.getElementById('sysStatus').textContent = '\u26A0';
+      document.getElementById('sysStatus').style.color = '#f59e0b';
+      document.getElementById('sysVersion').textContent = '?';
+      document.getElementById('sysUptime').textContent = 'N/A';
+    }
+  }
+
+  // ══════════════════════════════════════
+  //  COMMENTS
+  // ══════════════════════════════════════
+  async function loadAllComments() {
+    var tbody = document.getElementById('commentsTable');
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-muted);">Loading...</td></tr>';
+    try {
+      var r = await fetch('/api/admin/comments', {
+        headers: { 'X-Admin-Session': _adminToken || '' }
+      });
+      if (!r.ok) throw new Error('Unauthorized');
+      var comments = await r.json();
+      if (!comments.length) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-muted);">No comments yet.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = comments.map(function(c) {
+        return '<tr>'
+          + '<td>' + c.id + '</td>'
+          + '<td><a href="/article/' + (c.article_slug || c.article_id) + '" target="_blank" style="color:var(--orange);">#' + c.article_id + '</a></td>'
+          + '<td>' + esc(c.name) + '</td>'
+          + '<td>' + esc(c.comment.substring(0, 80)) + (c.comment.length > 80 ? '\u2026' : '') + '</td>'
+          + '<td>' + fmtDateTime(c.created_at) + '</td>'
+          + '<td><button class="admin-btn admin-btn-del" data-delete-comment="' + c.id + '">Delete</button></td>'
+          + '</tr>';
+      }).join('');
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text-muted);">Failed to load comments.</td></tr>';
+    }
+  }
+
+  async function deleteComment(commentId) {
+    if (!confirm('Delete comment #' + commentId + '?')) return;
+    try {
+      var r = await fetch('/api/admin/comments/' + commentId, {
+        method: 'DELETE',
+        headers: adminHeaders()
+      });
+      if (r.ok) { showToast('Comment deleted'); loadAllComments(); }
+      else { showToast('Failed to delete'); }
+    } catch (e) { showToast('Error: ' + e.message); }
+  }
+
+  // ══════════════════════════════════════
+  //  EVENT LISTENERS (attached via JS, NOT inline onclick)
+  // ══════════════════════════════════════
+  document.addEventListener('DOMContentLoaded', function() {
+    // Build header
+    var hw = document.getElementById('headerWrap');
+    if (hw) hw.innerHTML = buildHeader();
+
+    // Login form submit
+    var loginForm = document.getElementById('loginForm');
+    if (loginForm) loginForm.addEventListener('submit', handleLoginSubmit);
+
+    // Tab buttons (use event delegation)
+    var navBtns = document.querySelector('.admin-nav');
+    if (navBtns) {
+      navBtns.addEventListener('click', function(e) {
+        var btn = e.target.closest('button[data-tab]');
+        if (btn) showTab(btn.getAttribute('data-tab'), btn);
+      });
+    }
+
+    // System tab buttons
+    var triggerBtn = document.getElementById('triggerPipelineBtn');
+    if (triggerBtn) triggerBtn.addEventListener('click', triggerPipeline);
+
+    var healthBtn = document.getElementById('checkHealthBtn');
+    if (healthBtn) healthBtn.addEventListener('click', checkHealth);
+
+    var logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) logoutBtn.addEventListener('click', doLogout);
+
+    // Publish button
+    var pubBtn = document.getElementById('publishBtn');
+    if (pubBtn) pubBtn.addEventListener('click', publishArticle);
+
+    // Refresh buttons
+    var refreshContacts = document.getElementById('refreshContactsBtn');
+    if (refreshContacts) refreshContacts.addEventListener('click', loadContacts);
+
+    var refreshComments = document.getElementById('refreshCommentsBtn');
+    if (refreshComments) refreshComments.addEventListener('click', loadAllComments);
+
+    // Delegated click handlers for dynamic buttons (delete article, publish article, delete comment, mark read)
+    document.addEventListener('click', function(e) {
+      // V31: Edit article — opens modal with editable fields
+      var editArtBtn = e.target.closest('[data-edit-article]');
+      if (editArtBtn) {
+        openEditModal(parseInt(editArtBtn.getAttribute('data-edit-article'), 10));
+        return;
+      }
+      // Publish draft article
+      var pubArtBtn = e.target.closest('[data-publish-article]');
+      if (pubArtBtn) {
+        publishDraft(parseInt(pubArtBtn.getAttribute('data-publish-article'), 10));
+        return;
+      }
+      // Delete article
+      var delArtBtn = e.target.closest('[data-delete-article]');
+      if (delArtBtn) {
+        deleteArticle(parseInt(delArtBtn.getAttribute('data-delete-article'), 10));
+        return;
+      }
+      // Delete comment
+      var delCmtBtn = e.target.closest('[data-delete-comment]');
+      if (delCmtBtn) {
+        deleteComment(parseInt(delCmtBtn.getAttribute('data-delete-comment'), 10));
+        return;
+      }
+      // Mark contact as read
+      var markReadBtn = e.target.closest('[data-mark-read]');
+      if (markReadBtn) {
+        markRead(parseInt(markReadBtn.getAttribute('data-mark-read'), 10));
+        return;
+      }
+      // View trend draft detail
+      var viewTrendBtn = e.target.closest('[data-view-trend]');
+      if (viewTrendBtn) {
+        viewTrendDraft(parseInt(viewTrendBtn.getAttribute('data-view-trend'), 10));
+        return;
+      }
+      // Publish trend draft
+      var pubTrendBtn = e.target.closest('[data-publish-trend]');
+      if (pubTrendBtn) {
+        publishTrendDraft(parseInt(pubTrendBtn.getAttribute('data-publish-trend'), 10));
+        return;
+      }
+      // Delete trend draft
+      var delTrendBtn = e.target.closest('[data-delete-trend]');
+      if (delTrendBtn) {
+        deleteTrendDraft(parseInt(delTrendBtn.getAttribute('data-delete-trend'), 10));
+        return;
+      }
+    });
+
+    // Trends tab — Run Now button
+    var runTrendsBtn = document.getElementById('runTrendsBtn');
+    if (runTrendsBtn) runTrendsBtn.addEventListener('click', triggerTrendsCycle);
+
+    // Trends tab — Refresh button
+    var refreshTrendsBtn = document.getElementById('refreshTrendsBtn');
+    if (refreshTrendsBtn) refreshTrendsBtn.addEventListener('click', loadTrendsDrafts);
+
+    // Check existing session
+    if (_adminToken) {
+      verifySession();
+    }
+  });
+
+  // ══════════════════════════════════════
+  //  V26 TRENDS — Zero-Hallucination Content Engine
+  // ══════════════════════════════════════
+
+  async function loadTrendsDrafts() {
+    var tbody = document.getElementById('trendsTable');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--text-muted);">Loading trend drafts...</td></tr>';
+
+    try {
+      // Load both drafts and pipeline status in parallel
+      var [draftsRes, statusRes] = await Promise.all([
+        fetch('/api/admin/trends/drafts?status_filter=all&per_page=50', { headers: adminHeaders() }),
+        fetch('/api/admin/trends/status', { headers: adminHeaders() })
+      ]);
+
+      if (!draftsRes.ok) {
+        var err = await draftsRes.json().catch(() => ({}));
+        throw new Error(err.detail || ('HTTP ' + draftsRes.status));
+      }
+      var data = await draftsRes.json();
+      var status = statusRes.ok ? await statusRes.json() : {};
+
+      // Update stats
+      document.getElementById('trendsStatPending').textContent = (status.drafts_pending || 0).toLocaleString();
+      document.getElementById('trendsStatPublished').textContent = (status.drafts_published || 0).toLocaleString();
+      document.getElementById('trendsStatRunning').textContent = status.running ? '▶ Running' : 'Idle';
+      document.getElementById('trendsStatLastRun').textContent = status.last_run_ts
+        ? new Date(status.last_run_ts).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})
+        : '—';
+
+      // Update badge count
+      var badge = document.getElementById('trendsBadge');
+      if (badge) {
+        if (status.drafts_pending > 0) {
+          badge.textContent = status.drafts_pending;
+          badge.style.display = 'inline-block';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+
+      // Current query indicator
+      var currentQ = document.getElementById('trendsCurrentQuery');
+      if (currentQ) {
+        currentQ.textContent = status.running && status.current_query
+          ? 'Currently processing: "' + status.current_query + '"...'
+          : (status.last_error ? '⚠ Last error: ' + status.last_error : '');
+      }
+
+      // Render table
+      if (!data.drafts || data.drafts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text-muted);">' +
+          '<div style="font-size:48px;opacity:0.4;margin-bottom:12px;">📊</div>' +
+          '<strong style="color:var(--text);">No trend drafts yet</strong><br>' +
+          'The pipeline runs every 6 hours. Click "Run Trends Now" to trigger a cycle manually.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = data.drafts.map(function(d) {
+        var dateStr = d.date ? new Date(d.date).toLocaleString([], {
+          month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+        }) : '—';
+        var statusBadge = d.status === 'draft'
+          ? '<span style="background:rgba(245,158,11,0.15);color:#f59e0b;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;">Draft</span>'
+          : d.status === 'published'
+          ? '<span style="background:rgba(74,222,128,0.15);color:#4ade80;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;">Published</span>'
+          : '<span style="background:rgba(239,68,68,0.15);color:#ef4444;padding:3px 10px;border-radius:999px;font-size:11px;font-weight:700;text-transform:uppercase;">' + d.status + '</span>';
+
+        var actions = '<button data-view-trend="' + d.id + '" style="padding:6px 12px;background:var(--bg-3);border:1px solid var(--border);color:var(--text);border-radius:6px;cursor:pointer;font-size:12px;margin-right:4px;">View</button>';
+        if (d.status === 'draft') {
+          actions += '<button data-publish-trend="' + d.id + '" style="padding:6px 12px;background:var(--orange);border:none;color:#fff;border-radius:6px;cursor:pointer;font-size:12px;margin-right:4px;font-weight:600;">Publish</button>';
+          actions += '<button data-delete-trend="' + d.id + '" style="padding:6px 12px;background:transparent;border:1px solid #ef4444;color:#ef4444;border-radius:6px;cursor:pointer;font-size:12px;">Delete</button>';
+        }
+
+        return '<tr>' +
+          '<td style="color:var(--text-muted);">#' + d.id + '</td>' +
+          '<td style="max-width:320px;font-weight:600;color:var(--text);">' + escapeHtml(d.title || d.trend_query || 'Untitled') + '</td>' +
+          '<td><span style="color:var(--orange);font-weight:700;">' + (d.source_count || 0) + '</span></td>' +
+          '<td><span style="color:var(--text);font-weight:600;">' + (d.facts_verified || 0) + '</span></td>' +
+          '<td style="color:var(--text-muted);">' + (d.word_count || 0).toLocaleString() + '</td>' +
+          '<td>' + statusBadge + '</td>' +
+          '<td style="color:var(--text-muted);font-size:13px;">' + dateStr + '</td>' +
+          '<td style="white-space:nowrap;">' + actions + '</td>' +
+          '</tr>';
+      }).join('');
+
+    } catch (e) {
+      console.error('Trends load error:', e);
+      tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:#ef4444;">Error: ' + escapeHtml(e.message) + '</td></tr>';
+    }
+  }
+
+  async function triggerTrendsCycle() {
+    var btn = document.getElementById('runTrendsBtn');
+    if (btn) { btn.disabled = true; btn.textContent = '⏳ Triggering...'; }
+    try {
+      var r = await fetch('/api/admin/trends/run', {
+        method: 'POST',
+        headers: adminHeaders()
+      });
+      var data = await r.json();
+      if (!r.ok) throw new Error(data.detail || 'Trigger failed');
+      showToast('✓ Trends cycle started — drafts will appear within ~5 minutes');
+      // Poll status after a delay
+      setTimeout(loadTrendsDrafts, 3000);
+      setTimeout(loadTrendsDrafts, 15000);
+      setTimeout(loadTrendsDrafts, 60000);
+    } catch (e) {
+      showToast('✗ ' + e.message, 'error');
+    } finally {
+      if (btn) { btn.disabled = false; btn.innerHTML = '&#9654; Run Trends Now'; }
+    }
+  }
+
+  // ══════════════════════════════════════
+  //  V30 SFAAM AUTOMATED NEWS ENGINE (TRD v1.0)
+  // ══════════════════════════════════════
+
+  async function loadEngineDashboard() {
+    // Wire up buttons once
+    var runBtn = document.getElementById('runEngineBtn');
+    if (runBtn && !runBtn.dataset.wired) {
+      runBtn.addEventListener('click', function() { triggerEngineCycle(null); });
+      runBtn.dataset.wired = '1';
+    }
+    var runRegBtn = document.getElementById('runEngineRegionBtn');
+    if (runRegBtn && !runRegBtn.dataset.wired) {
+      runRegBtn.addEventListener('click', function() {
+        var sel = document.getElementById('engineSingleRegion');
+        var region = sel ? sel.value : '';
+        if (!region) { showToast('Select a region first', 'error'); return; }
+        triggerEngineCycle(region);
+      });
+      runRegBtn.dataset.wired = '1';
+    }
+    var refreshBtn = document.getElementById('refreshEngineBtn');
+    if (refreshBtn && !refreshBtn.dataset.wired) {
+      refreshBtn.addEventListener('click', loadEngineDashboard);
+      refreshBtn.dataset.wired = '1';
+    }
+    var filterSel = document.getElementById('engineRegionFilter');
+    if (filterSel && !filterSel.dataset.wired) {
+      filterSel.addEventListener('change', loadEngineDashboard);
+      filterSel.dataset.wired = '1';
+    }
+
+    // Load status, drafts, and cycles in parallel
+    var filter = (document.getElementById('engineRegionFilter') || {}).value || '';
+    var draftsUrl = '/api/admin/engine/drafts?per_page=50' + (filter ? '&region=' + encodeURIComponent(filter) : '');
+
+    try {
+      var [statusRes, draftsRes, cyclesRes] = await Promise.all([
+        fetch('/api/admin/engine/status', { headers: adminHeaders() }),
+        fetch(draftsUrl, { headers: adminHeaders() }),
+        fetch('/api/admin/engine/cycles?per_page=10', { headers: adminHeaders() }),
+      ]);
+
+      if (!statusRes.ok) throw new Error('Status HTTP ' + statusRes.status);
+      var status = await statusRes.json();
+      var drafts = draftsRes.ok ? await draftsRes.json() : { drafts: [] };
+      var cycles = cyclesRes.ok ? await cyclesRes.json() : { cycles: [] };
+
+      // Update stats
+      document.getElementById('engineStatDrafts').textContent = (status.drafts_pending || 0).toLocaleString();
+      document.getElementById('engineStatPublished').textContent = (status.drafts_published || 0).toLocaleString();
+      document.getElementById('engineStatCycles').textContent = (status.total_cycles || 0).toLocaleString();
+      var lastCycle = status.last_completed_at
+        ? new Date(status.last_completed_at).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'})
+        : '—';
+      document.getElementById('engineStatLastCycle').textContent = lastCycle;
+
+      // Update badge
+      var badge = document.getElementById('engineBadge');
+      if (badge) {
+        if (status.drafts_pending > 0) {
+          badge.textContent = status.drafts_pending;
+          badge.style.display = 'inline-block';
+        } else {
+          badge.style.display = 'none';
+        }
+      }
+
+      // Current region indicator
+      var curReg = document.getElementById('engineCurrentRegion');
+      if (curReg) {
+        curReg.textContent = status.running && status.current_region
+          ? 'Currently processing region: ' + status.current_region.toUpperCase() + '...'
+          : (status.last_error ? '⚠ Last error: ' + status.last_error : '');
+      }
+
+      // Provider health chips
+      var health = document.getElementById('engineProviderHealth');
+      if (health && status.regions) {
+        var html = '';
+        Object.keys(status.regions).forEach(function(k) {
+          var r = status.regions[k];
+          var color = r.any_llm ? '#4ade80' : '#ef4444';
+          var label = r.display + (r.any_llm ? ' ✓' : ' ✗');
+          html += '<span style="padding:4px 10px;background:' + color + '22;color:' + color +
+                  ';border:1px solid ' + color + ';border-radius:999px;font-size:12px;font-weight:600;">' + label + '</span>';
+        });
+        if (status.aggregators) {
+          var ag = status.aggregators;
+          if (ag.tavily) html += '<span style="padding:4px 10px;background:#22d3ee22;color:#22d3ee;border:1px solid #22d3ee;border-radius:999px;font-size:12px;">Tavily ✓</span>';
+          if (ag.newsapi) html += '<span style="padding:4px 10px;background:#22d3ee22;color:#22d3ee;border:1px solid #22d3ee;border-radius:999px;font-size:12px;">NewsAPI ✓</span>';
+          if (ag.gnews) html += '<span style="padding:4px 10px;background:#22d3ee22;color:#22d3ee;border:1px solid #22d3ee;border-radius:999px;font-size:12px;">GNews ✓</span>';
+        }
+        health.innerHTML = html;
+      }
+
+      // Render drafts table
+      var tbody = document.getElementById('engineTable');
+      if (!drafts.drafts || drafts.drafts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:40px;color:var(--text-muted);">' +
+          'No V30 engine drafts yet. Click <strong>Run Full Cycle</strong> above to start.</td></tr>';
+      } else {
+        var tierColors = { small: '#fbbf24', medium: '#60a5fa', large: '#a78bfa' };
+        var rows = drafts.drafts.map(function(d) {
+          var tierColor = tierColors[d.word_count_tier] || '#999';
+          var titleCell = '<strong style="color:var(--text);">' + escapeHtml(d.title || '') + '</strong>' +
+                          (d.trend_query ? '<br><span style="color:var(--text-muted);font-size:11px;">🔍 ' + escapeHtml(d.trend_query) + '</span>' : '');
+          var factsCell = (d.raw_facts_count || 0) + ' / <strong style="color:#4ade80;">' + (d.verified_facts_count || 0) + '</strong>';
+          var providerCell = d.llm_provider
+            ? '<span style="color:' + (d.llm_provider === 'groq' ? '#f5505e' : '#4285f4') + ';">' + d.llm_provider + '</span>'
+            : '—';
+          var actions = '<button onclick="publishEngineDraft(' + d.id + ')" style="padding:4px 10px;background:#4ade80;color:#000;border:none;border-radius:4px;cursor:pointer;font-weight:600;font-size:12px;">Publish</button>';
+          return '<tr>' +
+            '<td>' + d.id + '</td>' +
+            '<td style="max-width:280px;">' + titleCell + '</td>' +
+            '<td><span style="text-transform:uppercase;font-size:11px;font-weight:600;color:var(--text-muted);">' + escapeHtml(d.region || '') + '</span></td>' +
+            '<td><span style="padding:2px 8px;background:' + tierColor + '22;color:' + tierColor + ';border-radius:4px;font-size:11px;font-weight:700;text-transform:uppercase;">' + (d.word_count_tier || '—') + '</span></td>' +
+            '<td>' + (d.word_count || 0).toLocaleString() + '</td>' +
+            '<td>' + (d.source_count || 0) + '</td>' +
+            '<td>' + factsCell + '</td>' +
+            '<td>' + providerCell + '</td>' +
+            '<td>' + (d.trend_score || 0) + '</td>' +
+            '<td style="font-size:12px;color:var(--text-muted);">' + (d.date ? new Date(d.date).toLocaleString() : '—') + '</td>' +
+            '<td>' + actions + '</td>' +
+            '</tr>';
+        }).join('');
+        tbody.innerHTML = rows;
+      }
+
+      // Render cycles table
+      var cyclesTbody = document.getElementById('engineCyclesTable');
+      if (!cycles.cycles || cycles.cycles.length === 0) {
+        cyclesTbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:20px;color:var(--text-muted);">No cycles logged yet.</td></tr>';
+      } else {
+        var statusColors = { completed: '#4ade80', partial: '#fbbf24', failed: '#ef4444', running: '#60a5fa' };
+        var rows = cycles.cycles.map(function(c) {
+          var color = statusColors[c.status] || '#999';
+          var duration = c.total_elapsed_s ? (c.total_elapsed_s + 's') : '—';
+          return '<tr>' +
+            '<td style="font-family:monospace;font-size:11px;">' + (c.cycle_id || '').substring(0, 8) + '…</td>' +
+            '<td>' + (c.started_at ? new Date(c.started_at).toLocaleString() : '—') + '</td>' +
+            '<td>' + duration + '</td>' +
+            '<td>' + (c.regions_processed || 0) + '/6</td>' +
+            '<td style="color:#4ade80;font-weight:700;">' + (c.drafts_produced || 0) + '</td>' +
+            '<td style="color:#ef4444;font-weight:700;">' + (c.drafts_failed || 0) + '</td>' +
+            '<td>' + (c.skipped_duplicates || 0) + '</td>' +
+            '<td><span style="padding:2px 8px;background:' + color + '22;color:' + color + ';border-radius:4px;font-size:11px;font-weight:700;text-transform:uppercase;">' + (c.status || '—') + '</span></td>' +
+            '</tr>';
+        }).join('');
+        cyclesTbody.innerHTML = rows;
+      }
+    } catch (e) {
+      showToast('✗ Engine load error: ' + e.message, 'error');
+    }
+  }
+
+  async function triggerEngineCycle(region) {
+    var btn = document.getElementById('runEngineBtn');
+    if (btn && !region) { btn.disabled = true; btn.textContent = '⏳ Starting...'; }
+    try {
+      var url = '/api/admin/engine/run' + (region ? '?region=' + encodeURIComponent(region) : '');
+      var r = await fetch(url, { method: 'POST', headers: adminHeaders() });
+      var data = await r.json();
+      if (!r.ok) throw new Error(data.detail || 'Trigger failed');
+      showToast('✓ Engine cycle started — check status in a few minutes');
+      setTimeout(loadEngineDashboard, 3000);
+      setTimeout(loadEngineDashboard, 15000);
+      setTimeout(loadEngineDashboard, 60000);
+    } catch (e) {
+      showToast('✗ ' + e.message, 'error');
+    } finally {
+      if (btn && !region) { btn.disabled = false; btn.innerHTML = '&#9654; Run Full Cycle (All Regions)'; }
+    }
+  }
+
+  // ══════════════════════════════════════
+  // V31: EDIT ARTICLE MODAL  (V33 BUGFIX: now works for drafts too)
+  // ══════════════════════════════════════
+  async function openEditModal(id) {
+    try {
+      // V33 BUGFIX: Use the ADMIN endpoint /api/admin/articles/{id} instead of
+      // the public /api/articles/{id}. The public endpoint returns 404 for any
+      // article whose status is not "published" (drafts, pending_review,
+      // rejected). This meant the Edit modal could not open drafts at all —
+      // clicking Edit on a draft article threw "Could not load article".
+      // The admin endpoint returns the article regardless of status.
+      var r = await fetch('/api/admin/articles/' + id, { headers: adminHeaders() });
+      if (!r.ok) {
+        var errBody = await r.json().catch(function() { return {}; });
+        throw new Error(errBody.detail || ('Could not load article (HTTP ' + r.status + ')'));
+      }
+      var a = await r.json();
+      // Reuse trendModal — generic modal pattern in this file
+      var modal = document.getElementById('trendModal');
+      var body = document.getElementById('trendModalBody');
+      var titleEl = document.getElementById('trendModalTitle');
+      var actionsEl = document.getElementById('trendModalActions');
+      titleEl.textContent = 'Edit Article #' + id + (a.status && a.status !== 'published' ? '  (' + a.status + ')' : '');
+
+      // V33: Build status options for the dropdown. Default to the article's
+      // current status. This lets the admin promote a draft to published
+      // directly from the Edit modal — no need to close + click Publish.
+      var currentStatus = a.status || 'published';
+      var statusOptions = [
+        {value: 'published',     label: 'Published (visible to public)'},
+        {value: 'draft',         label: 'Draft (hidden, work in progress)'},
+        {value: 'pending_review',label: 'Pending Review'},
+        {value: 'rejected',      label: 'Rejected (hidden)'}
+      ];
+      var statusSelectHtml = '<select id="editStatus" style="width:100%;padding:8px;margin-top:4px;background:var(--bg-2);border:1px solid var(--border);color:var(--text);border-radius:4px;font-family:var(--font);">'
+        + statusOptions.map(function(opt) {
+            return '<option value="' + opt.value + '"' + (opt.value === currentStatus ? ' selected' : '') + '>' + opt.label + '</option>';
+          }).join('')
+        + '</select>';
+
+      // V33: Status hint banner — explains what publishing means
+      var statusBanner = currentStatus !== 'published'
+        ? '<div style="background:rgba(245,158,11,0.1);border-left:3px solid #f59e0b;padding:8px 12px;margin-bottom:12px;font-size:12px;color:#f59e0b;">This article is currently a <strong>' + esc(currentStatus) + '</strong>. Change the Status dropdown to <strong>Published</strong> and click <strong>Save &amp; Publish</strong> to make it live.</div>'
+        : '';
+
+      body.innerHTML = ''
+        + statusBanner
+        + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">'
+        + '<label style="display:block;"><span style="color:var(--text-muted);font-size:12px;">Status</span>' + statusSelectHtml + '</label>'
+        + '<label style="display:block;"><span style="color:var(--text-muted);font-size:12px;">Region</span><select id="editRegion" style="width:100%;padding:8px;margin-top:4px;background:var(--bg-2);border:1px solid var(--border);color:var(--text);border-radius:4px;font-family:var(--font);">'
+        +   ['world','usa','uk','pakistan','india','germany'].map(function(rg){return '<option value="'+rg+'"'+(rg===a.region?' selected':'')+'>'+rg.toUpperCase()+'</option>';}).join('')
+        + '</select></label>'
+        + '</div>'
+        + '<label style="display:block;margin-bottom:12px;"><span style="color:var(--text-muted);font-size:12px;">Title</span><input id="editTitle" value="' + esc(a.title) + '" style="width:100%;padding:8px;margin-top:4px;background:var(--bg-2);border:1px solid var(--border);color:var(--text);border-radius:4px;font-family:var(--font);"/></label>'
+        + '<label style="display:block;margin-bottom:12px;"><span style="color:var(--text-muted);font-size:12px;">Summary (max 280)</span><textarea id="editSummary" rows="2" maxlength="500" style="width:100%;padding:8px;margin-top:4px;background:var(--bg-2);border:1px solid var(--border);color:var(--text);border-radius:4px;font-family:var(--font);resize:vertical;">' + esc(a.summary || '') + '</textarea></label>'
+        + '<label style="display:block;margin-bottom:12px;"><span style="color:var(--text-muted);font-size:12px;">Meta Description (max 200)</span><input id="editMetaDesc" value="' + esc(a.meta_desc || '') + '" maxlength="200" style="width:100%;padding:8px;margin-top:4px;background:var(--bg-2);border:1px solid var(--border);color:var(--text);border-radius:4px;font-family:var(--font);"/></label>'
+        + '<label style="display:block;margin-bottom:12px;"><span style="color:var(--text-muted);font-size:12px;">Keywords (comma-separated)</span><input id="editKeywords" value="' + esc(a.keywords || '') + '" style="width:100%;padding:8px;margin-top:4px;background:var(--bg-2);border:1px solid var(--border);color:var(--text);border-radius:4px;font-family:var(--font);"/></label>'
+        + '<label style="display:block;margin-bottom:12px;"><span style="color:var(--text-muted);font-size:12px;">Image URL</span><input id="editImageUrl" value="' + esc(a.image_url || '') + '" style="width:100%;padding:8px;margin-top:4px;background:var(--bg-2);border:1px solid var(--border);color:var(--text);border-radius:4px;font-family:var(--font);"/></label>'
+        + '<label style="display:block;margin-bottom:12px;"><span style="color:var(--text-muted);font-size:12px;">TL;DR Summary</span><textarea id="editTldr" rows="2" maxlength="1000" style="width:100%;padding:8px;margin-top:4px;background:var(--bg-2);border:1px solid var(--border);color:var(--text);border-radius:4px;font-family:var(--font);resize:vertical;">' + esc(a.tldr_summary || '') + '</textarea></label>'
+        + '<label style="display:block;margin-bottom:8px;"><span style="color:var(--text-muted);font-size:12px;">Article Content (Markdown)</span><textarea id="editContent" rows="14" style="width:100%;padding:8px;margin-top:4px;background:var(--bg-2);border:1px solid var(--border);color:var(--text);border-radius:4px;font-family:var(--font);resize:vertical;font-size:13px;line-height:1.5;">' + esc(a.ai_content || '') + '</textarea></label>';
+
+      // V33: Actions row — Cancel + Save Changes (keeps status) + Save & Publish (sets status=published)
+      actionsEl.innerHTML = '<button id="editCancelBtn" style="padding:10px 18px;background:var(--bg-3);color:var(--text);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-family:var(--font);">Cancel</button>'
+        + '<button id="editSaveBtn" style="padding:10px 18px;background:#60a5fa;color:#000;border:none;border-radius:6px;cursor:pointer;font-weight:600;font-family:var(--font);">Save Changes</button>'
+        + '<button id="editPublishBtn" style="padding:10px 18px;background:#4ade80;color:#000;border:none;border-radius:6px;cursor:pointer;font-weight:700;font-family:var(--font);">Save &amp; Publish</button>';
+      modal.style.display = 'block';
+      document.getElementById('editCancelBtn').onclick = function() { modal.style.display = 'none'; };
+
+      // V33: Shared helper that builds the PATCH payload. If publish=true,
+      // forces status='published' regardless of what the dropdown says.
+      async function _saveArticle(publish) {
+        var payload = {
+          title: document.getElementById('editTitle').value.trim(),
+          summary: document.getElementById('editSummary').value.trim(),
+          ai_content: document.getElementById('editContent').value,
+          region: document.getElementById('editRegion').value,
+          keywords: document.getElementById('editKeywords').value.trim(),
+          meta_desc: document.getElementById('editMetaDesc').value.trim(),
+          image_url: document.getElementById('editImageUrl').value.trim(),
+          tldr_summary: document.getElementById('editTldr').value.trim(),
+          status: publish ? 'published' : document.getElementById('editStatus').value
+        };
+        if (!payload.title) { showToast('Title cannot be empty', 'error'); return; }
+        if (!payload.ai_content || payload.ai_content.length < 10) {
+          showToast('Article content must be at least 10 characters', 'error'); return;
+        }
+        var saveBtn = publish
+          ? document.getElementById('editPublishBtn')
+          : document.getElementById('editSaveBtn');
+        var originalText = saveBtn.textContent;
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+        try {
+          var pr = await fetch('/api/admin/articles/' + id, {
+            method: 'PATCH',
+            headers: Object.assign({}, adminHeaders(), {'Content-Type': 'application/json'}),
+            body: JSON.stringify(payload)
+          });
+          var pdata = await pr.json();
+          if (!pr.ok) throw new Error(pdata.detail || 'Save failed');
+          var msg = '\u2713 Article ' + (publish ? 'published' : 'updated');
+          if (pdata.slug) msg += ' \u2014 slug: /' + pdata.slug;
+          showToast(msg);
+          modal.style.display = 'none';
+          loadArticles();
+          loadStats();
+        } catch (e) {
+          showToast('\u2717 ' + e.message, 'error');
+        } finally {
+          saveBtn.disabled = false;
+          saveBtn.textContent = originalText;
+        }
+      }
+
+      document.getElementById('editSaveBtn').onclick = function() { _saveArticle(false); };
+      document.getElementById('editPublishBtn').onclick = function() { _saveArticle(true); };
+    } catch (e) {
+      showToast('\u2717 ' + e.message, 'error');
+    }
+  }
+  // Expose for any inline callers
+  window.openEditModal = openEditModal;
+
+  async function publishEngineDraft(id) {
+    if (!confirm('Publish this V30 engine draft? It will go live immediately.')) return;
+    try {
+      var r = await fetch('/api/admin/engine/' + id + '/publish', {
+        method: 'POST',
+        headers: adminHeaders()
+      });
+      var data = await r.json();
+      if (!r.ok) throw new Error(data.detail || 'Publish failed');
+      showToast('✓ Published: ' + (data.title || '').substring(0, 50));
+      loadEngineDashboard();
+    } catch (e) {
+      showToast('✗ ' + e.message, 'error');
+    }
+  }
+
+  function escapeHtml(s) {
+    if (!s) return '';
+    return s.replace(/[&<>"']/g, function(c) {
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  async function viewTrendDraft(id) {
+    var modal = document.getElementById('trendModal');
+    var body = document.getElementById('trendModalBody');
+    var titleEl = document.getElementById('trendModalTitle');
+    var actionsEl = document.getElementById('trendModalActions');
+    if (!modal || !body) return;
+
+    modal.style.display = 'block';
+    body.innerHTML = '<p style="color:var(--text-muted);">Loading draft...</p>';
+    titleEl.textContent = 'Trend Draft #' + id;
+    actionsEl.innerHTML = '';
+
+    try {
+      var r = await fetch('/api/admin/trends/' + id, { headers: adminHeaders() });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      var d = await r.json();
+
+      titleEl.textContent = d.title || ('Trend Draft #' + id);
+
+      var html = '';
+
+      // Meta info
+      html += '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;">';
+      html += '<div style="background:var(--card);padding:12px;border-radius:8px;border:1px solid var(--border);"><div style="color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:0.05em;">Sources</div><div style="color:var(--orange);font-weight:700;font-size:18px;">' + (d.source_count || 0) + '</div></div>';
+      html += '<div style="background:var(--card);padding:12px;border-radius:8px;border:1px solid var(--border);"><div style="color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:0.05em;">Verified Facts</div><div style="color:var(--text);font-weight:700;font-size:18px;">' + (d.verified_facts || []).length + '</div></div>';
+      html += '<div style="background:var(--card);padding:12px;border-radius:8px;border:1px solid var(--border);"><div style="color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:0.05em;">Words</div><div style="color:var(--text);font-weight:700;font-size:18px;">' + (d.word_count || 0).toLocaleString() + '</div></div>';
+      html += '<div style="background:var(--card);padding:12px;border-radius:8px;border:1px solid var(--border);"><div style="color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:0.05em;">Status</div><div style="font-weight:700;font-size:14px;text-transform:uppercase;color:' + (d.status === 'draft' ? '#f59e0b' : '#4ade80') + ';">' + d.status + '</div></div>';
+      html += '</div>';
+
+      // Trend query
+      if (d.trend_query) {
+        html += '<div style="background:rgba(202,109,76,0.08);border-left:3px solid var(--orange);padding:12px 16px;margin-bottom:20px;">';
+        html += '<div style="color:var(--text-muted);font-size:11px;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px;">Original Google Trend Query</div>';
+        html += '<div style="color:var(--text);font-weight:600;">"' + escapeHtml(d.trend_query) + '"</div>';
+        html += '</div>';
+      }
+
+      // Verified facts
+      if (d.verified_facts && d.verified_facts.length > 0) {
+        html += '<h4 style="color:var(--white);margin:20px 0 10px;font-size:15px;">✓ Cross-Verified Facts (' + d.verified_facts.length + ')</h4>';
+        html += '<div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">';
+        d.verified_facts.forEach(function(f, i) {
+          html += '<div style="background:var(--card);padding:10px 14px;border-radius:8px;border:1px solid var(--border);">';
+          html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:6px;">';
+          html += '<span style="color:var(--orange);font-weight:700;font-size:12px;">#' + (i+1) + ' · ' + f.confirmation_count + ' sources</span>';
+          html += '<span style="color:var(--text-dim);font-size:11px;">' + (f.source_domains || []).join(', ') + '</span>';
+          html += '</div>';
+          html += '<div style="color:var(--text);font-size:14px;line-height:1.5;">' + escapeHtml(f.text) + '</div>';
+          html += '</div>';
+        });
+        html += '</div>';
+      }
+
+      // Article content
+      html += '<h4 style="color:var(--white);margin:20px 0 10px;font-size:15px;">📄 Generated Article</h4>';
+      html += '<div style="background:var(--card);padding:16px;border-radius:8px;border:1px solid var(--border);font-size:14px;line-height:1.7;color:var(--text);max-height:400px;overflow:auto;white-space:pre-wrap;">' + escapeHtml(d.content || '') + '</div>';
+
+      // References
+      if (d.references && d.references.length > 0) {
+        html += '<h4 style="color:var(--white);margin:20px 0 10px;font-size:15px;">🔗 References (' + d.references.length + ')</h4>';
+        html += '<ul style="list-style:none;padding:0;margin:0;">';
+        d.references.forEach(function(ref, i) {
+          html += '<li style="margin-bottom:6px;font-size:13px;"><a href="' + escapeHtml(ref) + '" target="_blank" rel="noopener" style="color:var(--orange);word-break:break-all;">' + (i+1) + '. ' + escapeHtml(ref) + '</a></li>';
+        });
+        html += '</ul>';
+      }
+
+      body.innerHTML = html;
+
+      // Actions
+      if (d.status === 'draft') {
+        actionsEl.innerHTML =
+          '<button data-publish-trend="' + id + '" style="padding:10px 20px;background:var(--orange);border:none;color:#fff;border-radius:8px;cursor:pointer;font-weight:700;font-size:14px;">✓ Publish</button>' +
+          '<button data-delete-trend="' + id + '" style="padding:10px 20px;background:transparent;border:1px solid #ef4444;color:#ef4444;border-radius:8px;cursor:pointer;font-weight:600;font-size:14px;">✗ Delete</button>';
+      } else if (d.status === 'published') {
+        actionsEl.innerHTML = '<a href="/article/' + (d.slug || d.id) + '" target="_blank" style="padding:10px 20px;background:var(--bg-3);border:1px solid var(--border);color:var(--text);border-radius:8px;text-decoration:none;font-weight:600;font-size:14px;">View Live ↗</a>';
+      }
+
+    } catch (e) {
+      body.innerHTML = '<p style="color:#ef4444;">Error loading draft: ' + escapeHtml(e.message) + '</p>';
+    }
+  }
+
+  async function publishTrendDraft(id) {
+    if (!confirm('Publish this trend article? It will appear on the public Trends page immediately.')) return;
+    try {
+      var r = await fetch('/api/admin/trends/' + id + '/publish', {
+        method: 'POST',
+        headers: adminHeaders()
+      });
+      if (!r.ok) {
+        var err = await r.json().catch(() => ({}));
+        throw new Error(err.detail || 'Publish failed');
+      }
+      showToast('✓ Trend published successfully!');
+      document.getElementById('trendModal').style.display = 'none';
+      loadTrendsDrafts();
+    } catch (e) {
+      showToast('✗ ' + e.message, 'error');
+    }
+  }
+
+  async function deleteTrendDraft(id) {
+    if (!confirm('Delete this trend draft permanently? This cannot be undone.')) return;
+    try {
+      var r = await fetch('/api/admin/trends/' + id, {
+        method: 'DELETE',
+        headers: adminHeaders()
+      });
+      if (!r.ok) {
+        var err = await r.json().catch(() => ({}));
+        throw new Error(err.detail || 'Delete failed');
+      }
+      showToast('✓ Trend draft deleted');
+      document.getElementById('trendModal').style.display = 'none';
+      loadTrendsDrafts();
+    } catch (e) {
+      showToast('✗ ' + e.message, 'error');
+    }
+  }
+
+  function escapeHtml(s) {
+    if (s === null || s === undefined) return '';
+    return String(s).replace(/[&<>"']/g, function(c) {
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+
+  function adminHeaders() {
+    // V26 FIX: include X-CSRF-Token so admin POST/PUT/PATCH/DELETE pass CSRF middleware
+    var h = { 'X-Admin-Session': _adminToken || '' };
+    if (_csrfToken) h['X-CSRF-Token'] = _csrfToken;
+    return h;
+  }
+
+  // V31 FIX: Expose functions called by inline onclick="" handlers.
+  // The IIFE above keeps these private to its closure, but inline handlers
+  // execute in global scope — so onclick="publishEngineDraft(123)" was
+  // throwing ReferenceError: publishEngineDraft is not defined.
+  // Also expose handleLoginSubmit (called by <form onsubmit> on line 27).
+  window.publishEngineDraft = publishEngineDraft;
+  window.handleLoginSubmit = handleLoginSubmit;
+
+})();
+</script>
+</body>
+</html>

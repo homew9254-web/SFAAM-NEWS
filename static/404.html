@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Page Not Found &mdash; SFAAM NEWS</title>
+<meta name="description" content="The page you're looking for doesn't exist or may have moved."/>
+<meta name="robots" content="noindex, follow"/>
+<link rel="icon" type="image/png" href="logo.png"/>
+<link rel="apple-touch-icon" href="logo.png"/>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#D97757"/>
+<meta name="msapplication-TileColor" content="#D97757"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/style.css"/>
+</head>
+<body>
+<a href="#main-content" class="skip-nav">Skip to main content</a>
+<div id="headerWrap"></div>
+<div id="navWrap"></div>
+<main class="error-page" id="main-content">
+  <div class="error-code">404</div>
+  <h1>This page doesn't exist</h1>
+  <p>The link may be broken, or the page may have moved. Try searching for what you were looking for, or head back to the homepage.</p>
+  <a href="/" class="error-btn">Back to Homepage</a>
+</main>
+<div id="footerWrap"></div>
+<button class="scroll-top" id="scrollTopBtn" aria-label="Scroll to top">&uarr;</button>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('headerWrap').innerHTML = buildHeader();
+  document.getElementById('navWrap').innerHTML    = buildNav('');
+  document.getElementById('footerWrap').innerHTML = buildFooter();
+  initScrollTop();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+# Nixpacks configuration for Railway (fallback when Dockerfile is not preferred)
+# This file lets Railway build the app without Docker.
+# Docs: https://nixpacks.com/docs/configuration/file
+
+[phases.setup]
+nixPkgs = ["python311", "gcc", "postgresql.lib"]
+
+[phases.install]
+cmds = [
+  "pip install --no-cache-dir -r requirements.txt"
+]
+
+[phases.build]
+cmds = [
+  "mkdir -p static/images static/css static/js"
+]
+
+[start]
+cmd = "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"
+
+[variables]
+PYTHONUNBUFFERED = "1"
+PYTHONDONTWRITEBYTECODE = "1"

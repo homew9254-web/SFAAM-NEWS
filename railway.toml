@@ -1,0 +1,15 @@
+# ============================================
+# SFAAM NEWS V29 - Railway Configuration
+# Yeh file Railway ko batati hai ke app kaise
+# build aur start hogi
+# ============================================
+
+[build]
+builder = "NIXPACKS"
+
+[deploy]
+startCommand = "uvicorn main:app --host 0.0.0.0 --port $PORT"
+healthcheckPath = "/health"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 10

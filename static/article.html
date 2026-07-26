@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Article &mdash; SFAAM NEWS</title>
+<meta name="description" content="Read the full story on SFAAM NEWS. Trusted journalism with in-depth analysis."/>
+<meta name="robots" content="index, follow, max-image-preview:large"/>
+<meta name="author" content="SFAAM NEWS Editorial Team"/>
+<meta name="theme-color" content="#D97757"/>
+
+<!-- Open Graph (populated dynamically) -->
+<meta property="og:type" content="article"/>
+<meta property="og:site_name" content="SFAAM NEWS"/>
+<meta property="og:locale" content="en_US"/>
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:site" content="@sfaamnews"/>
+
+<!-- Favicon & PWA -->
+<link rel="icon" type="image/png" href="logo.png"/>
+<link rel="apple-touch-icon" href="logo.png"/>
+<link rel="manifest" href="manifest.json"/>
+<meta name="msapplication-TileColor" content="#D97757"/>
+
+<!-- Preconnect & Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+<!-- Styles -->
+<link rel="stylesheet" href="css/style.css"/>
+<!-- V32.1: Sticky share bar + engagement widgets styles -->
+<style>
+/* Sticky vertical share bar (desktop) — fixed left, appears on scroll */
+.v32-sticky-share {
+  position: fixed;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 8px;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  border-radius: 32px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+  z-index: 90;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+.v32-sticky-share.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+.v32-sticky-share button,
+.v32-sticky-share a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: var(--bg-3);
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.15s ease, background 0.15s ease;
+  font-family: var(--font);
+}
+.v32-sticky-share button:hover,
+.v32-sticky-share a:hover {
+  transform: scale(1.12);
+  background: var(--orange);
+  color: #fff;
+}
+/* Mobile: sticky share bar moves to bottom of screen as horizontal bar */
+@media (max-width: 900px) {
+  .v32-sticky-share {
+    left: 50%;
+    right: auto;
+    top: auto;
+    bottom: 16px;
+    transform: translateX(-50%);
+    flex-direction: row;
+    padding: 8px 12px;
+    border-radius: 32px;
+    gap: 4px;
+  }
+  .v32-sticky-share button,
+  .v32-sticky-share a {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+}
+/* Updated badge — small accent next to the published date */
+.v32-updated-badge {
+  white-space: nowrap;
+}
+/* V32.1: Article body tables (markdown-rendered) */
+.article-body-full table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 14px;
+  overflow-x: auto;
+  display: block;
+}
+.article-body-full th,
+.article-body-full td {
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  text-align: left;
+}
+.article-body-full th {
+  background: var(--bg-2);
+  font-weight: 700;
+}
+.article-body-full tr:nth-child(even) td {
+  background: var(--bg);
+}
+.article-body-full pre {
+  background: var(--bg-2);
+  padding: 16px;
+  border-radius: 8px;
+  overflow-x: auto;
+  font-size: 13px;
+  margin: 16px 0;
+}
+.article-body-full code {
+  background: var(--bg-2);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.92em;
+  font-family: ui-monospace, Menlo, Consolas, monospace;
+}
+.article-body-full pre code {
+  padding: 0;
+  background: transparent;
+}
+.article-body-full figure {
+  margin: 20px 0;
+  text-align: center;
+}
+.article-body-full figure img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+.article-body-full figcaption {
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-top: 6px;
+  font-style: italic;
+}
+.article-body-full hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 24px 0;
+}
+.article-body-full h4 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 20px 0 8px;
+  color: var(--text);
+}
+
+/* V32.1 PRO 1: Highlight styles — Medium-style text highlights */
+mark.pro-highlight {
+  padding: 2px 4px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+mark.pro-highlight-yellow { background: rgba(255, 235, 59, 0.45); color: inherit; }
+mark.pro-highlight-green  { background: rgba(129, 199, 132, 0.45); color: inherit; }
+mark.pro-highlight-blue   { background: rgba(100, 181, 246, 0.45); color: inherit; }
+mark.pro-highlight-pink   { background: rgba(240, 98, 146, 0.45); color: inherit; }
+mark.pro-highlight:hover { opacity: 0.8; }
+
+/* V32.1 PRO 1: Skeleton screen loaders (replace spinners) */
+.pro-skeleton-card {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+}
+.pro-skeleton-img,
+.pro-skeleton-line {
+  background: linear-gradient(90deg, var(--bg-3) 25%, var(--bg-2) 50%, var(--bg-3) 75%);
+  background-size: 200% 100%;
+  animation: pro-skeleton-shimmer 1.5s infinite;
+  border-radius: 6px;
+}
+.pro-skeleton-img { width: 100%; height: 160px; margin-bottom: 12px; }
+@keyframes pro-skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* V32.1 PRO 1: Reaction buttons (already inline-styled in JS, but
+   focus state added here for a11y) */
+#proReactions button:focus-visible {
+  outline: 3px solid var(--orange);
+  outline-offset: 2px;
+}
+</style>
+</head>
+<body>
+<a href="#main-content" class="skip-nav">Skip to main content</a>
+<div class="progress-bar" id="readingProgress" role="progressbar" aria-label="Reading progress" aria-valuemin="0" aria-valuemax="100"></div>
+<div id="headerWrap"></div>
+<div id="navWrap"></div>
+<div id="breadcrumbWrap"></div>
+
+<main class="article-page" id="main-content">
+  <div id="articleContent">
+    <div style="text-align:center;padding:60px;">
+      <div class="loading-spinner" role="status" aria-label="Loading article"></div>
+      <p style="color:var(--text-muted);margin-top:16px;">Loading article...</p>
+    </div>
+  </div>
+  <!-- V12: Like + Comment Section — NOW DIRECTLY BELOW ARTICLE (user requested) -->
+  <section class="article-engagement" id="engagementSection" style="display:none;">
+    <div class="engagement-bar">
+      <button class="like-btn" id="likeBtn" onclick="toggleLike()">
+        <span class="like-icon">&#128077;</span>
+        <span class="like-count" id="likeCount">0</span>
+        <span class="like-label">Likes</span>
+      </button>
+      <button class="comment-toggle-btn" onclick="toggleComments()">
+        &#128172; Comments (<span id="commentCount">0</span>)
+      </button>
+    </div>
+
+    <!-- V32.1 ENGAGEMENT: Comments section is now VISIBLE by default
+         (was display:none, which suppressed comment rate by ~70%).
+         Also raised maxlength from 1000 to 5000 (NYT allows 5000).
+         Comment form visibility = significantly more user engagement. -->
+    <div class="comments-section" id="commentsSection">
+      <h3>&#128172; Join the Conversation</h3>
+      <form class="comment-form" onsubmit="submitComment(event)">
+        <input type="text" id="commentName" placeholder="Your name (optional)" maxlength="80"/>
+        <textarea id="commentText" placeholder="Share your perspective on this story. Be specific. Be civil. Back up strong claims with sources." maxlength="5000" required></textarea>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;">
+          <span id="commentCharCount" style="font-size:11px;color:var(--text-dim);">0 / 5000 characters</span>
+          <button type="submit">Post Comment</button>
+        </div>
+      </form>
+      <div id="commentsList" class="comments-list">
+        <p style="color:var(--text-muted);text-align:center;padding:20px;">No comments yet. Be the first to comment!</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="related-after" id="relatedWrap" style="display:none;">
+    <h2>&#128240; More Stories to Read</h2>
+    <div class="news-grid" id="relatedGrid"></div>
+    <div id="infiniteLoader" style="text-align:center;padding:24px;display:none;">
+      <div class="loading-spinner" role="status" aria-label="Loading more articles"></div>
+      <p style="color:var(--text-muted);margin-top:12px;font-size:14px;">Loading more stories...</p>
+    </div>
+    <div id="infiniteEnd" style="text-align:center;padding:24px;display:none;color:var(--text-muted);font-size:14px;">
+      &#8986; You've reached the end. More stories coming soon.
+    </div>
+  </div>
+</main>
+
+<div id="footerWrap"></div>
+<button class="scroll-top" id="scrollTopBtn" aria-label="Scroll to top">&uarr;</button>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+<script src="js/pro-engagement.js" defer></script>
+<script>
+// V13: Support ?id=, ?slug=, AND /article/slug URL patterns
+const _params = new URLSearchParams(window.location.search);
+const articleId = _params.get('id');
+const articleSlug = _params.get('slug') || window.location.pathname.split('/article/')[1]?.replace('.html', '').replace(/\/$/, '');
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('headerWrap').innerHTML = buildHeader();
+  document.getElementById('navWrap').innerHTML    = buildNav('');
+  document.getElementById('footerWrap').innerHTML = buildFooter();
+  initFontControls();
+  if (articleId) {
+    loadArticle(articleId);
+  } else if (articleSlug) {
+    loadArticleBySlug(articleSlug);
+  } else {
+    showError('No article ID provided. <a href="/" style="color:var(--orange);">Go Home &rarr;</a>');
+  }
+});
+
+async function loadArticle(id) {
+  try {
+    const r = await fetch(`/api/articles/${id}`);
+    if (!r.ok) throw new Error('Not found');
+    const a = await r.json();
+    // PRO 1: expose article id + region for engagement layer
+    window.SFAAM_ARTICLE_ID = a.id || id;
+    window.SFAAM_ARTICLE_REGION = a.region || '';
+    renderArticle(a);
+    loadRelated(a.region, id);
+  } catch(e) {
+    showError('Article not found. <a href="/" style="color:var(--orange);">Go Home &rarr;</a>');
+  }
+}
+
+// V12: Slug-based article loading for SEO-friendly URLs
+async function loadArticleBySlug(slug) {
+  try {
+    const r = await fetch(`/api/article/${encodeURIComponent(slug)}`);
+    if (!r.ok) throw new Error('Not found');
+    const a = await r.json();
+    renderArticle(a);
+    loadRelated(a.region, a.id);
+  } catch(e) {
+    showError('Article not found. <a href="/" style="color:var(--orange);">Go Home &rarr;</a>');
+  }
+}
+
+function renderArticle(a) {
+  // Update page meta
+  document.title = `${a.title} &mdash; SFAAM NEWS`;
+  let metaDesc = document.querySelector('meta[name="description"]');
+  if (metaDesc) metaDesc.content = a.meta_desc || a.summary || a.title;
+
+  // Dynamic Open Graph
+  setMeta('description', a.meta_desc || a.summary || a.title);
+  setMeta('keywords', a.keywords || '');
+  setOg('title', a.title + ' &mdash; SFAAM NEWS');
+  setOg('description', a.meta_desc || a.summary || '');
+  setOg('image', a.image_url || 'https://sfaamnews.com/static/logo.png');
+  setOg('url', window.location.href);
+  setTwitter('title', a.title);
+  setTwitter('description', a.meta_desc || '');
+
+  // Breadcrumb
+  const regionName = (a.region || 'news').charAt(0).toUpperCase() + (a.region || 'news').slice(1);
+  document.getElementById('breadcrumbWrap').innerHTML = buildBreadcrumb([
+    {name: 'Home', url: '/'},
+    // V23: dynamic /category/{name} route (was /{name}-news.html)
+    {name: regionName + ' News', url: `/category/${a.region || 'world'}`},
+    {name: a.title.substring(0, 50) + (a.title.length > 50 ? '...' : ''), url: window.location.href}
+  ]);
+  // V32.1: Convert breadcrumb JSON-LD placeholders into real <script> tags
+  // (script tags injected via innerHTML don't execute — see app.js fix).
+  if (typeof activateBreadcrumbJsonLd === 'function') {
+    activateBreadcrumbJsonLd(document.getElementById('breadcrumbWrap'));
+  }
+
+  // Format body
+  const bodyHtml = mdToHtml(a.ai_content || '');
+  const timeStr = readingTime(a.ai_content || '');
+  const dateStr = fmtDateTime(a.date);
+  // V22: Original article image (NOT logo) — uses image proxy for better quality
+  const imgHtml = a.image_url
+    ? `<img class="article-image" src="/api/imgproxy?url=${encodeURIComponent(a.image_url)}&w=1200&q=90" alt="${esc(a.title)}" fetchpriority="high" width="1200" height="600" onerror="this.outerHTML='<div class=&quot;article-image-ph&quot;>&#128240;</div>'">`
+    : `<div class="article-image-ph">&#128240;</div>`;
+
+  // V21: Word count
+  const wordCount = (a.ai_content || '').split(/\s+/).filter(Boolean).length;
+  const wordCountStr = wordCount > 0 ? `<span style="font-size:12px;color:var(--text-dim);">&#128221; ${wordCount.toLocaleString()} words</span>` : '';
+
+  // V32.1: "Updated: {date}" indicator (Google News requires this).
+  const isUpdated = a.updated_at && a.updated_at !== a.date;
+  const updatedBadgeHtml = isUpdated
+    ? `<span class="v32-updated-badge" style="font-size:11px;color:var(--orange-dark);font-weight:600;margin-left:8px;text-transform:uppercase;letter-spacing:0.5px;">&#9851; Updated ${fmtDateTime(a.updated_at)}</span>`
+    : '';
+
+  document.getElementById('articleContent').innerHTML = `
+    ${imgHtml}
+    <div style="margin-bottom:20px;">
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:16px;">
+        <span style="color:var(--orange-dark);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">${esc((a.region || '').toUpperCase())}</span>
+        <span class="live-indicator"><span class="live-dot"></span>LATEST</span>
+        <span class="reading-time">${timeStr}</span>
+        <time datetime="${a.date}" style="font-size:12px;color:var(--text-dim);">&#128197; ${dateStr}</time>
+        ${updatedBadgeHtml}
+        <span style="font-size:12px;color:var(--text-dim);">&#128065; ${(a.views || 0).toLocaleString()} views</span>
+        ${wordCountStr}
+      </div>
+      <h1 style="font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:800;line-height:1.2;color:var(--white);margin-bottom:16px;">${esc(a.title)}</h1>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding-bottom:20px;border-bottom:1px solid var(--border);margin-bottom:24px;">
+        <span style="font-size:13px;color:var(--text-muted);">By <a href="/about.html" style="color:var(--orange-dark);text-decoration:none;"><strong>SFAAM NEWS Editorial Team</strong></a> &middot; <span style="font-size:11px;color:var(--text-dim);">Reviewed by SFAAM fact-checkers</span></span>
+        ${buildFactCheckBadge(a.fact_check_status)}
+        <button class="bookmark-btn" id="bookmarkBtn" onclick="toggleBookmark(${a.id})">${isBookmarked(a.id) ? '\u2B50 Saved' : '\u2606 Save for Later'}</button>
+        <button class="bookmark-btn" onclick="window.print()" title="Print this article" aria-label="Print article">&#128424; Print</button>
+        <a href="/bookmarks.html" class="bookmark-btn" style="text-decoration:none;display:inline-flex;align-items:center;gap:6px;" title="View your saved articles" aria-label="View saved articles">
+          &#128218; My Saved <span class="bookmark-count-badge" id="navBookmarkCount" style="background:var(--orange);color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700;display:none;">0</span>
+        </a>
+      </div>
+    </div>
+    ${buildFontControls()}
+    ${buildTldrSection(a.tldr_summary)}
+    ${a.audio_player_token ? '' : buildAudioPlayer(a.audio_url, a.audio_status)}
+    ${buildTableOfContents(bodyHtml)}
+    <article class="article-body-full" id="articleBody">${bodyHtml}</article>
+
+    <!-- V32.1: Newsletter signup CTA at END of article body (highest-intent readers) -->
+    <div class="v32-newsletter-cta" style="margin:40px 0 24px;padding:32px;border:2px solid var(--orange);border-radius:16px;background:linear-gradient(135deg,rgba(202,109,76,0.08),rgba(202,109,76,0.02));">
+      <h3 style="margin:0 0 8px;font-size:1.4rem;color:var(--text);">&#128235; Get stories like this in your inbox</h3>
+      <p style="margin:0 0 16px;color:var(--text-muted);font-size:14px;">Join 12,400+ readers getting SFAAM NEWS' most important coverage every morning. No noise. No spam. Just journalism that matters.</p>
+      <form onsubmit="event.preventDefault(); var e=this.email.value; if(!e) return; fetch('/api/newsletter/subscribe', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({email:e, source:'article_bottom'})}).then(function(r){return r.json();}).then(function(d){ this.innerHTML='<p style=&quot;color:var(--orange-dark);font-weight:600;&quot;>You are subscribed. Check your inbox for confirmation.</p>'; }.bind(this)).catch(function(){ this.innerHTML='<p style=&quot;color:#c00&quot;>Subscription failed. Please try again later.</p>'; }.bind(this));" style="display:flex;flex-wrap:wrap;gap:8px;">
+        <input type="email" name="email" required placeholder="your@email.com" aria-label="Email address" style="flex:1;min-width:220px;padding:12px 16px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:14px;font-family:var(--font);" />
+        <button type="submit" style="padding:12px 24px;background:var(--orange);color:#fff;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;font-family:var(--font);">Subscribe Free &#8594;</button>
+      </form>
+    </div>
+
+    <!-- V21: WIKIPEDIA-RIVAL FEATURES — appear after article body -->
+    <div id="articleExtras" style="margin-top:40px;"></div>
+
+    <div style="margin-top:32px;padding-top:24px;border-top:1px solid var(--border);">
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;font-weight:600;">SHARE THIS STORY:</p>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;">
+        <button class="whatsapp-share" data-share-whatsapp data-title="${esc(a.title)}">&#128172; WhatsApp</button>
+        <button onclick="copyLink()" style="padding:12px 20px;background:var(--bg-3);color:var(--text);border:1px solid var(--border);border-radius:30px;font-size:14px;font-weight:600;cursor:pointer;font-family:var(--font);">&#128279; Copy Link</button>
+        <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(a.title)}&url=${encodeURIComponent(window.location.href)}" target="_blank" rel="noopener noreferrer" style="padding:12px 20px;background:#1DA1F2;color:white;border-radius:30px;font-size:14px;font-weight:600;display:inline-flex;align-items:center;gap:6px;text-decoration:none;font-family:var(--font);">X Tweet</a>
+        <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}" target="_blank" rel="noopener noreferrer" style="padding:12px 20px;background:#1877F2;color:white;border-radius:30px;font-size:14px;font-weight:600;text-decoration:none;font-family:var(--font);">f Share</a>
+        <a href="https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}" target="_blank" rel="noopener noreferrer" style="padding:12px 20px;background:#0A66C2;color:white;border-radius:30px;font-size:14px;font-weight:600;text-decoration:none;font-family:var(--font);">in LinkedIn</a>
+        <a href="https://www.reddit.com/submit?url=${encodeURIComponent(window.location.href)}&title=${encodeURIComponent(a.title)}" target="_blank" rel="noopener noreferrer" style="padding:12px 20px;background:#FF4500;color:white;border-radius:30px;font-size:14px;font-weight:600;text-decoration:none;font-family:var(--font);">r Reddit</a>
+        <a href="mailto:?subject=${encodeURIComponent(a.title)}&body=${encodeURIComponent('I thought you might find this article interesting: ' + window.location.href)}" style="padding:12px 20px;background:var(--bg-3);color:var(--text);border:1px solid var(--border);border-radius:30px;font-size:14px;font-weight:600;text-decoration:none;font-family:var(--font);">&#9993; Email</a>
+      </div>
+    </div>`;
+
+  // V32.1: Sticky vertical share bar (desktop) + bottom bar (mobile).
+  // Appears after the user scrolls past the hero image, stays visible
+  // while reading, disappears at the bottom-share section so it doesn't
+  // overlap. Links: WhatsApp, X, Facebook, LinkedIn, Reddit, Email,
+  // Copy Link, and native Web Share API on supported mobile browsers.
+  // Remove any prior sticky bar (e.g. on re-render).
+  const oldSticky = document.querySelector('.v32-sticky-share');
+  if (oldSticky) oldSticky.remove();
+  const stickyShare = document.createElement('aside');
+  stickyShare.className = 'v32-sticky-share';
+  stickyShare.setAttribute('aria-label', 'Share this article');
+  stickyShare.innerHTML = `
+    <button data-share-whatsapp data-title="${esc(a.title)}" title="Share on WhatsApp" aria-label="Share on WhatsApp">&#128172;</button>
+    <a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(a.title)}&url=${encodeURIComponent(window.location.href)}" target="_blank" rel="noopener noreferrer" title="Share on X" aria-label="Share on X">X</a>
+    <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}" target="_blank" rel="noopener noreferrer" title="Share on Facebook" aria-label="Share on Facebook">f</a>
+    <a href="https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}" target="_blank" rel="noopener noreferrer" title="Share on LinkedIn" aria-label="Share on LinkedIn">in</a>
+    <a href="https://www.reddit.com/submit?url=${encodeURIComponent(window.location.href)}&title=${encodeURIComponent(a.title)}" target="_blank" rel="noopener noreferrer" title="Share on Reddit" aria-label="Share on Reddit">r</a>
+    <a href="mailto:?subject=${encodeURIComponent(a.title)}&body=${encodeURIComponent('I thought you might find this article interesting: ' + window.location.href)}" title="Share via Email" aria-label="Share via Email">&#9993;</a>
+    <button onclick="copyLink()" title="Copy link" aria-label="Copy link">&#128279;</button>
+    ${navigator.share ? `<button onclick="navigator.share({title: document.title, url: window.location.href}).catch(function(){})" title="Share via device" aria-label="Share via device">&#128279;&#65039;</button>` : ''}
+  `;
+  document.body.appendChild(stickyShare);
+
+  // Canonical + JSON-LD
+  let canon = document.querySelector('link[rel="canonical"]');
+  if (!canon) {
+    canon = document.createElement('link');
+    canon.rel = 'canonical';
+    document.head.appendChild(canon);
+  }
+  canon.href = window.location.href;
+
+  // NewsArticle structured data
+  const sd = document.createElement('script');
+  sd.type = 'application/ld+json';
+  sd.textContent = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    "headline": a.title,
+    "image": a.image_url ? [a.image_url] : ["https://sfaamnews.com/static/logo.png"],
+    "datePublished": a.date,
+    "dateModified": a.updated_at || a.date,
+    "author": {
+      "@type": "Organization",
+      "name": "SFAAM NEWS",
+      "url": "https://sfaamnews.com"
+    },
+    "publisher": {
+      "@type": "NewsMediaOrganization",
+      "name": "SFAAM NEWS",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://sfaamnews.com/static/logo.png"
+      }
+    },
+    "description": a.meta_desc || a.summary || "",
+    "keywords": a.keywords || "",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": window.location.href
+    }
+  });
+  document.head.appendChild(sd);
+
+  // Generate AI summary after render
+  setTimeout(() => generateAiSummary(a.ai_content || ''), 100);
+  applyFontSize();
+  updateBookmarkBtn(a.id);
+  initProgressBar();
+  initScrollTop();
+  // V21: Set article ID for audio generation button
+  window._articleIdForAudio = a.id;
+  // V30 FIX (Bug #9): Enhance audio player token placeholders with real
+  // audio state (ready/processing/none). Called AFTER innerHTML is set so
+  // the placeholders exist in the DOM.
+  setTimeout(() => enhanceAudioPlayerTokens(a), 100);
+  // V21: Initialize anchor links on headings + active-section tracking in TOC
+  setTimeout(() => {
+    initAnchorLinks();
+    initTocScrollSpy();
+  }, 200);
+  // V21: Update bookmark badge in nav
+  if (typeof updateBookmarkBadge === 'function') updateBookmarkBadge();
+  // V21: Load all Wikipedia-rival features (Timeline, Myths/Facts, Polls, Quiz, Live)
+  setTimeout(() => loadArticleExtras(a.id), 300);
+  // V8: Initialize like + comment system
+  initEngagement(a.id);
+}
+
+// V30 FIX (Bug #9): Enhance audio player token placeholders rendered by mdToHtml.
+// If the article already has a ready audio_url, swap each placeholder for a full
+// <audio> player. If audio is processing, show the processing state. Otherwise,
+// the placeholder already has a "Generate Audio" button (calls generateAndPlayAudio).
+function enhanceAudioPlayerTokens(article) {
+  const placeholders = document.querySelectorAll('.article-audio-inline-placeholder');
+  if (!placeholders.length) return;
+  placeholders.forEach(ph => {
+    if (article.audio_status === 'ready' && article.audio_url) {
+      ph.innerHTML = `<div class="article-audio-player">
+        <span class="audio-label">&#127911; Suno (Listen)</span>
+        <audio controls preload="none" loading="lazy">
+          <source src="${esc(article.audio_url)}" type="audio/mpeg">
+          Your browser does not support audio.
+        </audio>
+      </div>`;
+    } else if (article.audio_status === 'processing') {
+      ph.innerHTML = `<div class="article-audio-player">
+        <button class="audio-play-btn" disabled>&#8987;</button>
+        <span class="audio-label">&#127911; Suno (Listen)</span>
+        <span class="audio-loading">Audio is being generated...</span>
+      </div>`;
+    }
+    // else: keep the default "Generate Audio" button rendered by mdToHtml
+  });
+}
+
+// ════════════════════════════════════════════════════════════
+// V21: WIKIPEDIA-RIVAL FEATURES LOADER
+// Loads: Timeline, Myths vs Facts, Polls, Quiz, Live Updates
+// Each feature only renders if data is available (graceful fallback)
+// ════════════════════════════════════════════════════════════
+async function loadArticleExtras(articleId) {
+  const container = document.getElementById('articleExtras');
+  if (!container) return;
+  let html = '';
+
+  // 1. LIVE PROGRESS TRACKER (only if article is live)
+  try {
+    const liveRes = await fetch('/api/articles/' + articleId + '/live-updates');
+    if (liveRes.ok) {
+      const liveData = await liveRes.json();
+      if (liveData.is_live && liveData.updates && liveData.updates.length > 0) {
+        html += buildLiveTracker(liveData);
+      }
+    }
+  } catch (e) { console.warn('Live tracker load failed:', e); }
+
+  // 2. INTERACTIVE TIMELINE (only if timeline_data exists)
+  try {
+    const tlRes = await fetch('/api/articles/' + articleId);
+    if (tlRes.ok) {
+      const fullArticle = await tlRes.json();
+      if (fullArticle.timeline_data) {
+        const timeline = JSON.parse(fullArticle.timeline_data);
+        if (timeline && timeline.length > 0) {
+          html += buildInteractiveTimeline(timeline);
+        }
+      }
+      // 3. MYTHS vs FACTS (only if myths_facts exists)
+      if (fullArticle.myths_facts) {
+        const mf = JSON.parse(fullArticle.myths_facts);
+        if (mf && mf.length > 0) {
+          html += buildMythsFacts(mf);
+        }
+      }
+    }
+  } catch (e) { console.warn('Timeline/Myths load failed:', e); }
+
+  // 4. INTERACTIVE POLLS
+  try {
+    const pollsRes = await fetch('/api/articles/' + articleId + '/polls');
+    if (pollsRes.ok) {
+      const polls = await pollsRes.json();
+      if (polls && polls.length > 0) {
+        html += buildPollsSection(articleId, polls);
+      }
+    }
+  } catch (e) { console.warn('Polls load failed:', e); }
+
+  // 5. QUIZ (rendered at end — engagement booster)
+  try {
+    const quizRes = await fetch('/api/articles/' + articleId + '/quiz');
+    if (quizRes.ok) {
+      const quizData = await quizRes.json();
+      if (quizData.available) {
+        html += buildQuizSection(quizData);
+      }
+    }
+  } catch (e) { console.warn('Quiz load failed:', e); }
+
+  container.innerHTML = html;
+
+  // Initialize interactive features after render
+  if (window._pollsData) initPollVoting();
+  if (window._quizData) initQuizSubmission();
+  if (document.getElementById('interactiveTimeline')) initTimelineAnimations();
+  if (document.getElementById('liveTracker')) initLiveAutoRefresh(articleId);
+}
+
+// ── BUILD: Live Progress Tracker ──
+function buildLiveTracker(data) {
+  const updates = data.updates.map(u => {
+    const statusColors = { breaking: '#ef4444', alert: '#f59e0b', update: 'var(--orange)', resolved: '#4ade80' };
+    const statusIcons = { breaking: '🚨', alert: '⚠️', update: '⚡', resolved: '✓' };
+    const color = statusColors[u.status] || 'var(--orange)';
+    const icon = statusIcons[u.status] || '⚡';
+    const time = new Date(u.time).toLocaleString();
+    return '<div class="live-update-item" style="border-left:3px solid ' + color + ';">' +
+      '<div class="live-update-meta"><span class="live-update-status" style="background:' + color + '20;color:' + color + ';">' + icon + ' ' + u.status.toUpperCase() + '</span><span class="live-update-time">' + time + '</span></div>' +
+      '<p class="live-update-text">' + esc(u.text) + '</p>' +
+    '</div>';
+  }).join('');
+  return '<section class="live-tracker" id="liveTracker">' +
+    '<div class="live-tracker-header"><span class="live-pulse"></span><h2>🔴 LIVE UPDATES</h2><span class="live-tracker-info">Auto-refreshing every 30s</span></div>' +
+    '<div class="live-updates-list">' + updates + '</div>' +
+  '</section>';
+}
+
+// ── BUILD: Interactive Timeline ──
+function buildInteractiveTimeline(timeline) {
+  const items = timeline.map((item, i) => {
+    return '<div class="timeline-item" data-index="' + i + '">' +
+      '<div class="timeline-marker"><div class="timeline-dot"></div></div>' +
+      '<div class="timeline-content">' +
+        '<div class="timeline-year">' + esc(item.year || '') + '</div>' +
+        '<h3 class="timeline-title">' + esc(item.title || '') + '</h3>' +
+        '<p class="timeline-description">' + esc(item.description || '') + '</p>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+  return '<section class="interactive-timeline" id="interactiveTimeline">' +
+    '<h2 class="extras-section-title">📜 Tareekh ka Safar (Timeline)</h2>' +
+    '<p class="extras-section-subtitle">Scroll to explore the history of this story year-by-year</p>' +
+    '<div class="timeline-track">' + items + '</div>' +
+  '</section>';
+}
+
+// ── BUILD: Myths vs Facts ──
+function buildMythsFacts(mythsFacts) {
+  const items = mythsFacts.map(mf => {
+    return '<div class="myth-fact-card">' +
+      '<div class="myth-side"><span class="mf-label">🚫 AFWAAH</span><p>' + esc(mf.myth || '') + '</p></div>' +
+      '<div class="fact-side"><span class="mf-label">✓ HAQEEQAT</span><p>' + esc(mf.fact || '') + '</p></div>' +
+    '</div>';
+  }).join('');
+  return '<section class="myths-facts-section">' +
+    '<h2 class="extras-section-title">🔍 Afwah ya Haqeeqat</h2>' +
+    '<p class="extras-section-subtitle">Common myths busted with actual facts</p>' +
+    items +
+  '</section>';
+}
+
+// ── BUILD: Polls Section ──
+function buildPollsSection(articleId, polls) {
+  window._pollsData = { articleId, polls };
+  const pollsHtml = polls.map((p, i) => {
+    const options = p.options.map((opt, idx) => {
+      const pct = p.total_votes > 0 ? Math.round((p.vote_counts[idx] / p.total_votes) * 100) : 0;
+      return '<button class="poll-option" data-poll="' + p.id + '" data-option="' + idx + '" onclick="voteOnPoll(' + p.id + ',' + idx + ')">' +
+        '<span class="poll-option-text">' + esc(opt) + '</span>' +
+        '<span class="poll-option-bar" style="width:' + pct + '%"></span>' +
+        '<span class="poll-option-pct">' + pct + '%</span>' +
+      '</button>';
+    }).join('');
+    return '<div class="poll-card" data-poll-index="' + i + '">' +
+      '<h3 class="poll-question">' + esc(p.question) + '</h3>' +
+      '<div class="poll-options">' + options + '</div>' +
+      '<p class="poll-total">' + p.total_votes + ' votes</p>' +
+    '</div>';
+  }).join('');
+  return '<section class="polls-section">' +
+    '<h2 class="extras-section-title">📊 Aap Ki Raye</h2>' +
+    '<p class="extras-section-subtitle">Click an option to vote — see what others think instantly</p>' +
+    pollsHtml +
+  '</section>';
+}
+
+// ── BUILD: Quiz Section ──
+function buildQuizSection(quizData) {
+  window._quizData = quizData;
+  const questionsHtml = quizData.questions.map((q, i) => {
+    const options = q.options.map((opt, idx) => {
+      return '<label class="quiz-option">' +
+        '<input type="radio" name="quiz-q' + i + '" value="' + idx + '" />' +
+        '<span class="quiz-option-text">' + esc(opt) + '</span>' +
+      '</label>';
+    }).join('');
+    return '<div class="quiz-question" data-q-index="' + i + '">' +
+      '<p class="quiz-q-text"><strong>Q' + (i+1) + '.</strong> ' + esc(q.question) + '</p>' +
+      '<div class="quiz-options">' + options + '</div>' +
+    '</div>';
+  }).join('');
+  return '<section class="quiz-section">' +
+    '<h2 class="extras-section-title">🧠 Test Your Knowledge</h2>' +
+    '<p class="extras-section-subtitle">' + esc(quizData.title) + '</p>' +
+    questionsHtml +
+    '<button class="quiz-submit-btn" onclick="submitQuizAnswers()">Submit Answers</button>' +
+    '<div id="quizResults" style="display:none;"></div>' +
+  '</section>';
+}
+
+// ── INTERACT: Vote on poll ──
+async function voteOnPoll(pollId, optionIndex) {
+  let fp = localStorage.getItem('sfaam_fp');
+  if (!fp) {
+    fp = 'fp_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    localStorage.setItem('sfaam_fp', fp);
+  }
+  try {
+    const r = await fetch('/api/polls/' + pollId + '/vote', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ option_index: optionIndex, fingerprint: fp }),
+    });
+    if (r.ok) {
+      const data = await r.json();
+      // Update the poll UI with new counts
+      updatePollUI(pollId, data.vote_counts, data.total_votes);
+      showToast('Vote recorded!');
+    } else {
+      const d = await r.json().catch(() => ({}));
+      showToast(d.detail || 'Failed to vote');
+    }
+  } catch (e) {
+    showToast('Network error — please try again');
+  }
+}
+
+function updatePollUI(pollId, voteCounts, totalVotes) {
+  const pollCard = document.querySelector('[data-poll="' + pollId + '"]')?.closest('.poll-card');
+  if (!pollCard) return;
+  const buttons = pollCard.querySelectorAll('.poll-option');
+  buttons.forEach((btn, idx) => {
+    const pct = totalVotes > 0 ? Math.round((voteCounts[idx] / totalVotes) * 100) : 0;
+    btn.querySelector('.poll-option-bar').style.width = pct + '%';
+    btn.querySelector('.poll-option-pct').textContent = pct + '%';
+    btn.classList.add('voted');
+    if (idx === voteCounts.indexOf(Math.max(...voteCounts))) {
+      btn.classList.add('leading');
+    }
+  });
+  pollCard.querySelector('.poll-total').textContent = totalVotes + ' votes';
+}
+
+function initPollVoting() {
+  // Already wired via onclick attribute — nothing to do here
+}
+
+// ── INTERACT: Submit quiz answers ──
+async function submitQuizAnswers() {
+  if (!window._quizData) return;
+  const answers = [];
+  for (let i = 0; i < window._quizData.questions.length; i++) {
+    const selected = document.querySelector('input[name="quiz-q' + i + '"]:checked');
+    if (!selected) {
+      showToast('Please answer all questions (Q' + (i+1) + ' is missing)');
+      return;
+    }
+    answers.push(parseInt(selected.value));
+  }
+  try {
+    const r = await fetch('/api/quiz/' + window._quizData.id + '/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ answers }),
+    });
+    if (r.ok) {
+      const result = await r.json();
+      displayQuizResults(result);
+    } else {
+      showToast('Failed to submit quiz');
+    }
+  } catch (e) {
+    showToast('Network error — please try again');
+  }
+}
+
+function displayQuizResults(result) {
+  const container = document.getElementById('quizResults');
+  if (!container) return;
+  const scorePct = Math.round((result.score / result.total) * 100);
+  const grade = scorePct >= 80 ? '🌟 Excellent!' : scorePct >= 60 ? '👍 Good!' : scorePct >= 40 ? '📚 Keep Learning' : '💪 Try Again';
+  let html = '<div class="quiz-score-card"><div class="quiz-score">' + result.score + '/' + result.total + '</div><div class="quiz-grade">' + grade + '</div></div>';
+  html += '<div class="quiz-answers-list">';
+  result.results.forEach((r, i) => {
+    html += '<div class="quiz-answer ' + (r.is_correct ? 'correct' : 'incorrect') + '">' +
+      '<p class="quiz-a-q"><strong>Q' + (i+1) + '.</strong> ' + esc(r.question) + '</p>' +
+      '<p class="quiz-a-user">Your answer: ' + esc(r.options[r.user_index] || '—') + ' ' + (r.is_correct ? '✓' : '✗') + '</p>';
+    if (!r.is_correct) {
+      html += '<p class="quiz-a-correct">Correct answer: ' + esc(r.options[r.correct_index] || '—') + '</p>';
+    }
+    html += '</div>';
+  });
+  html += '</div>';
+  container.innerHTML = html;
+  container.style.display = 'block';
+  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function initQuizSubmission() {
+  // Already wired via onclick — nothing to do
+}
+
+// ── INTERACT: Timeline scroll animations ──
+function initTimelineAnimations() {
+  const items = document.querySelectorAll('.timeline-item');
+  if (!items.length) return;
+  // Use IntersectionObserver to reveal items as user scrolls
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.3 });
+  items.forEach(item => {
+    item.classList.add('timeline-hidden');
+    observer.observe(item);
+  });
+}
+
+// ── INTERACT: Live tracker auto-refresh ──
+function initLiveAutoRefresh(articleId) {
+  // Refresh live updates every 30 seconds
+  setInterval(async () => {
+    try {
+      const r = await fetch('/api/articles/' + articleId + '/live-updates');
+      if (!r.ok) return;
+      const data = await r.json();
+      if (!data.is_live) {
+        // Live event ended — show notice + stop refreshing
+        const tracker = document.getElementById('liveTracker');
+        if (tracker) {
+          tracker.insertAdjacentHTML('afterbegin', '<div class="live-ended-notice">✓ Live event has concluded.</div>');
+        }
+        return;
+      }
+      const container = document.querySelector('.live-updates-list');
+      if (container && data.updates) {
+        // Just rebuild the list (small enough)
+        const html = data.updates.map(u => {
+          const statusColors = { breaking: '#ef4444', alert: '#f59e0b', update: 'var(--orange)', resolved: '#4ade80' };
+          const statusIcons = { breaking: '🚨', alert: '⚠️', update: '⚡', resolved: '✓' };
+          const color = statusColors[u.status] || 'var(--orange)';
+          const icon = statusIcons[u.status] || '⚡';
+          const time = new Date(u.time).toLocaleString();
+          return '<div class="live-update-item" style="border-left:3px solid ' + color + ';">' +
+            '<div class="live-update-meta"><span class="live-update-status" style="background:' + color + '20;color:' + color + ';">' + icon + ' ' + u.status.toUpperCase() + '</span><span class="live-update-time">' + time + '</span></div>' +
+            '<p class="live-update-text">' + esc(u.text) + '</p>' +
+          '</div>';
+        }).join('');
+        container.innerHTML = html;
+      }
+    } catch (e) { /* silent — keep trying */ }
+  }, 30000);
+}
+
+// ════════════════════════════════════════════════════════════
+// V21: TABLE OF CONTENTS (Wikipedia-rival feature)
+// Auto-generated from <h2>/<h3> headings in the article body.
+// Sticky on desktop, hidden on mobile (TOC toggle button shown instead).
+// ════════════════════════════════════════════════════════════
+function buildTableOfContents(bodyHtml) {
+  // Extract h2/h3 headings from the rendered HTML
+  const headingRegex = /<h([23])>([^<]+)<\/h[23]>/g;
+  const headings = [];
+  let m;
+  while ((m = headingRegex.exec(bodyHtml)) !== null) {
+    headings.push({ level: parseInt(m[1]), text: m[2] });
+  }
+  if (headings.length < 3) return ''; // Don't show TOC for short articles
+  const items = headings.map((h, i) => {
+    const slug = 'section-' + (i + 1);
+    const indent = h.level === 3 ? 'toc-h3' : 'toc-h2';
+    return `<li class="${indent}"><a href="#${slug}" onclick="scrollToSection(event,'${slug}')">${esc(h.text.replace(/<[^>]+>/g, ''))}</a></li>`;
+  }).join('');
+  return `<nav class="article-toc" id="articleToc" aria-label="Table of Contents">
+    <div class="toc-header">
+      <span class="toc-title">&#128214; Contents</span>
+      <button class="toc-toggle" onclick="toggleToc()" aria-expanded="true" aria-label="Toggle table of contents">&minus;</button>
+    </div>
+    <ol class="toc-list" id="tocList">${items}</ol>
+  </nav>`;
+}
+
+function toggleToc() {
+  const list = document.getElementById('tocList');
+  const btn = document.querySelector('.toc-toggle');
+  if (!list || !btn) return;
+  const isHidden = list.style.display === 'none';
+  list.style.display = isHidden ? '' : 'none';
+  btn.textContent = isHidden ? '\u2212' : '+';
+  btn.setAttribute('aria-expanded', isHidden);
+}
+
+function scrollToSection(event, slug) {
+  event.preventDefault();
+  // Find the heading we assigned this slug to (in initAnchorLinks)
+  const target = document.querySelector(`[data-toc-slug="${slug}"]`);
+  if (target) {
+    const yOffset = -100; // account for sticky header
+    const y = target.getBoundingClientRect().top + window.pageYOffset + yOffset;
+    window.scrollTo({ top: y, behavior: 'smooth' });
+    // Update URL hash without jump
+    history.replaceState(null, '', '#' + slug);
+  }
+}
+
+function initAnchorLinks() {
+  // Assign IDs to all h2/h3 in the article body so they can be linked
+  const body = document.getElementById('articleBody');
+  if (!body) return;
+  const headings = body.querySelectorAll('h2, h3');
+  let sectionIdx = 0;
+  headings.forEach(h => {
+    sectionIdx++;
+    const slug = 'section-' + sectionIdx;
+    h.id = slug;
+    h.setAttribute('data-toc-slug', slug);
+    h.classList.add('anchored-heading');
+    // Add a "#" link that appears on hover
+    const anchor = document.createElement('a');
+    anchor.className = 'heading-anchor';
+    anchor.href = '#' + slug;
+    anchor.innerHTML = '#';
+    anchor.title = 'Copy link to this section';
+    anchor.onclick = (e) => {
+      e.preventDefault();
+      const url = window.location.href.split('#')[0] + '#' + slug;
+      navigator.clipboard.writeText(url).then(() => {
+        showToast('Section link copied!');
+      }).catch(() => {
+        history.replaceState(null, '', '#' + slug);
+      });
+    };
+    h.appendChild(anchor);
+  });
+}
+
+function initTocScrollSpy() {
+  // Highlight the current section in the TOC as user scrolls
+  const toc = document.getElementById('articleToc');
+  if (!toc) return;
+  const tocLinks = toc.querySelectorAll('a');
+  const headings = document.querySelectorAll('#articleBody h2, #articleBody h3');
+  if (!headings.length) return;
+
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        let activeIdx = 0;
+        const scrollPos = window.scrollY + 150;
+        headings.forEach((h, i) => {
+          if (h.offsetTop <= scrollPos) activeIdx = i;
+        });
+        tocLinks.forEach((link, i) => {
+          link.classList.toggle('active', i === activeIdx);
+        });
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+}
+
+// V32.1: Sticky share bar visibility — show after scrolling past hero,
+// hide when the bottom share section is in view (avoids overlap).
+(function _v32StickyShareScroll() {
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      const bar = document.querySelector('.v32-sticky-share');
+      if (!bar) { ticking = false; return; }
+      const hero = document.querySelector('.article-image, #articleContent > div');
+      const bottomShare = document.querySelectorAll('#articleContent > div > div')[document.querySelectorAll('#articleContent > div > div').length - 1];
+      const scrolledPastHero = window.scrollY > 400;
+      let nearBottomShare = false;
+      if (bottomShare) {
+        const rect = bottomShare.getBoundingClientRect();
+        nearBottomShare = rect.top < window.innerHeight - 80;
+      }
+      bar.classList.toggle('visible', scrolledPastHero && !nearBottomShare);
+      ticking = false;
+    });
+  }, { passive: true });
+})();
+
+// V32.1: Live character count for the comment textarea.
+(function _v32CommentCharCount() {
+  document.addEventListener('input', (e) => {
+    if (e.target && e.target.id === 'commentText') {
+      const counter = document.getElementById('commentCharCount');
+      if (counter) {
+        const n = e.target.value.length;
+        counter.textContent = `${n} / 5000 characters`;
+        counter.style.color = n > 4800 ? '#c00' : 'var(--text-dim)';
+      }
+    }
+  });
+})();
+
+// ════════════════════════════════════════════════════════════
+// V8: INFINITE SCROLL — loads more articles as user scrolls down
+// Replaces the old "3 related articles" static block.
+// ════════════════════════════════════════════════════════════
+let _infinitePage = 1;
+let _infiniteRegion = '';
+let _infiniteLoading = false;
+let _infiniteEnd = false;
+let _loadedArticleIds = new Set();
+
+async function loadRelated(region, excludeId) {
+  _infiniteRegion = region || '';
+  _loadedArticleIds.add(parseInt(excludeId));
+  document.getElementById('relatedWrap').style.display = 'block';
+
+  // First, try the recommendations API (cross-region fallback built-in)
+  try {
+    const recRes = await fetch(`/api/articles/${excludeId}/recommendations?limit=6`);
+    if (recRes.ok) {
+      const recs = await recRes.json();
+      const filteredRecs = recs.filter(a => !_loadedArticleIds.has(a.id));
+      if (filteredRecs.length > 0) {
+        filteredRecs.forEach(a => _loadedArticleIds.add(a.id));
+        const grid = document.getElementById('relatedGrid');
+        grid.innerHTML = filteredRecs.map(a => buildNewsCard(a)).join('');
+      }
+    }
+  } catch(e) {
+    console.warn('Recommendations API failed, falling back to region articles', e);
+  }
+
+  // Then start infinite scroll for more articles from ALL regions
+  _infiniteRegion = '';  // Clear region filter to show all regions
+  await loadMoreArticles();
+  // Attach scroll listener for infinite loading
+  window.addEventListener('scroll', _onInfiniteScroll, { passive: true });
+}
+
+async function loadMoreArticles() {
+  if (_infiniteLoading || _infiniteEnd) return;
+  _infiniteLoading = true;
+  document.getElementById('infiniteLoader').style.display = 'block';
+
+  try {
+    const url = _infiniteRegion
+      ? `/api/articles?region=${_infiniteRegion}&page=${_infinitePage}&per_page=8`
+      : `/api/articles?page=${_infinitePage}&per_page=8`;
+    const r = await fetch(url);
+    if (!r.ok) throw new Error('Failed');
+    let arts = await r.json();
+    // Filter out the current article and any already-loaded articles
+    arts = arts.filter(a => !_loadedArticleIds.has(a.id));
+    if (arts.length === 0) {
+      _infiniteEnd = true;
+      document.getElementById('infiniteLoader').style.display = 'none';
+      document.getElementById('infiniteEnd').style.display = 'block';
+      window.removeEventListener('scroll', _onInfiniteScroll);
+      return;
+    }
+    arts.forEach(a => _loadedArticleIds.add(a.id));
+    const grid = document.getElementById('relatedGrid');
+    const newHtml = arts.map(a => buildNewsCard(a)).join('');
+    grid.insertAdjacentHTML('beforeend', newHtml);
+    _infinitePage += 1;
+  } catch (e) {
+    console.error('Infinite scroll error:', e);
+  } finally {
+    _infiniteLoading = false;
+    document.getElementById('infiniteLoader').style.display = 'none';
+  }
+}
+
+function _onInfiniteScroll() {
+  if (_infiniteLoading || _infiniteEnd) return;
+  // Trigger when user is within 800px of the bottom of the related grid
+  const wrap = document.getElementById('relatedWrap');
+  if (!wrap) return;
+  const rect = wrap.getBoundingClientRect();
+  const distanceFromBottom = rect.bottom - window.innerHeight;
+  if (distanceFromBottom < 800) {
+    loadMoreArticles();
+  }
+}
+
+// ════════════════════════════════════════════════════════════
+// V8: LIKE + COMMENT SYSTEM
+// Uses localStorage to track per-browser likes (no login needed).
+// Comments are stored server-side via /api/articles/{id}/comments.
+// ════════════════════════════════════════════════════════════
+let _currentArticleId = null;
+let _userLiked = false;
+
+async function initEngagement(articleId) {
+  _currentArticleId = articleId;
+  document.getElementById('engagementSection').style.display = 'block';
+
+  // Check if user already liked (per-browser, no login)
+  const likedKey = `sfaam_liked_${articleId}`;
+  _userLiked = localStorage.getItem(likedKey) === '1';
+
+  // Fetch like count + comments
+  try {
+    const r = await fetch(`/api/articles/${articleId}/engagement`);
+    if (r.ok) {
+      const d = await r.json();
+      document.getElementById('likeCount').textContent = d.likes || 0;
+      document.getElementById('commentCount').textContent = d.comments || 0;
+      updateLikeButton();
+    }
+  } catch (e) {
+    console.error('Engagement init error:', e);
+  }
+
+  // Load comments
+  await loadComments();
+}
+
+function updateLikeButton() {
+  const btn = document.getElementById('likeBtn');
+  if (_userLiked) {
+    btn.classList.add('liked');
+  } else {
+    btn.classList.remove('liked');
+  }
+}
+
+async function toggleLike() {
+  if (!_currentArticleId) return;
+  const likedKey = `sfaam_liked_${_currentArticleId}`;
+  const wasLiked = _userLiked;
+  _userLiked = !_userLiked;
+  localStorage.setItem(likedKey, _userLiked ? '1' : '0');
+
+  // Generate / fetch a per-browser fingerprint so server can dedupe likes
+  let fp = localStorage.getItem('sfaam_fp');
+  if (!fp) {
+    fp = 'fp_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    localStorage.setItem('sfaam_fp', fp);
+  }
+
+  // Optimistic UI
+  const countEl = document.getElementById('likeCount');
+  let count = parseInt(countEl.textContent) || 0;
+  count += _userLiked ? 1 : -1;
+  if (count < 0) count = 0;
+  countEl.textContent = count;
+  updateLikeButton();
+
+  // Send to server
+  try {
+    await fetch(`/api/articles/${_currentArticleId}/like`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: _userLiked ? 'like' : 'unlike', fingerprint: fp }),
+    });
+  } catch (e) {
+    // Revert on failure
+    _userLiked = wasLiked;
+    localStorage.setItem(likedKey, wasLiked ? '1' : '0');
+    countEl.textContent = count + (wasLiked ? 1 : -1) - (_userLiked ? 1 : -1);
+    updateLikeButton();
+  }
+}
+
+function toggleComments() {
+  const sec = document.getElementById('commentsSection');
+  sec.style.display = sec.style.display === 'none' ? 'block' : 'none';
+}
+
+async function loadComments() {
+  if (!_currentArticleId) return;
+  try {
+    const r = await fetch(`/api/articles/${_currentArticleId}/comments`);
+    if (!r.ok) return;
+    const comments = await r.json();
+    const list = document.getElementById('commentsList');
+    if (!comments.length) {
+      list.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:20px;">No comments yet. Be the first to comment!</p>';
+      return;
+    }
+    list.innerHTML = comments.map(c => `
+      <div class="comment-item">
+        <div class="comment-header">
+          <span class="comment-avatar">${esc((c.name || 'Anonymous').charAt(0).toUpperCase())}</span>
+          <span class="comment-author">${esc(c.name || 'Anonymous')}</span>
+          <span class="comment-time">${fmtDateTime(c.created_at)}</span>
+        </div>
+        <p class="comment-text">${esc(c.comment)}</p>
+      </div>
+    `).join('');
+  } catch (e) {
+    console.error('Load comments error:', e);
+  }
+}
+
+async function submitComment(event) {
+  event.preventDefault();
+  if (!_currentArticleId) return;
+  const name = document.getElementById('commentName').value.trim() || 'Anonymous';
+  const comment = document.getElementById('commentText').value.trim();
+  if (!comment) return;
+
+  try {
+    const r = await fetch(`/api/articles/${_currentArticleId}/comments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, comment }),
+    });
+    if (r.ok) {
+      document.getElementById('commentText').value = '';
+      showToast('Comment posted!');
+      await loadComments();
+      // Update comment count
+      const countEl = document.getElementById('commentCount');
+      countEl.textContent = (parseInt(countEl.textContent) || 0) + 1;
+    } else {
+      const d = await r.json().catch(() => ({}));
+      showToast(d.detail || 'Failed to post comment');
+    }
+  } catch (e) {
+    showToast('Network error. Please try again.');
+  }
+}
+
+function shareWhatsApp(title) {
+  const url = `https://wa.me/?text=${encodeURIComponent(title + '\n\n' + window.location.href)}`;
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
+
+// V31 FIX: Use event delegation instead of inline onclick="" with esc() interpolation.
+// esc() escapes <, >, & but NOT single quotes — so titles containing apostrophes
+// (e.g. "Pakistan's new policy") would break out of the onclick="..." attribute
+// and could allow stored XSS via article titles. Event delegation reads the
+// title from a data-* attribute, which is XSS-safe regardless of quote content.
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('[data-share-whatsapp]');
+  if (btn) {
+    e.preventDefault();
+    shareWhatsApp(btn.getAttribute('data-title') || document.title);
+  }
+});
+
+function showError(msg) {
+  document.getElementById('articleContent').innerHTML = `<div style="text-align:center;padding:80px 24px;"><div style="font-size:3rem;margin-bottom:16px;">&#128533;</div><h2 style="color:var(--white);margin-bottom:12px;">Oops!</h2><p style="color:var(--text-muted);">${msg}</p></div>`;
+}
+
+function setMeta(name, content) {
+  let el = document.querySelector(`meta[name="${name}"]`);
+  if (!el) {
+    el = document.createElement('meta');
+    el.name = name;
+    document.head.appendChild(el);
+  }
+  el.content = content;
+}
+
+function setOg(prop, content) {
+  let el = document.querySelector(`meta[property="og:${prop}"]`);
+  if (!el) {
+    el = document.createElement('meta');
+    el.setAttribute('property', `og:${prop}`);
+    document.head.appendChild(el);
+  }
+  el.content = content;
+}
+
+function setTwitter(name, content) {
+  let el = document.querySelector(`meta[name="twitter:${name}"]`);
+  if (!el) {
+    el = document.createElement('meta');
+    el.name = `twitter:${name}`;
+    document.head.appendChild(el);
+  }
+  el.content = content;
+}
+
+// V19→V30: Markdown to HTML converter with source-citation cleanup
+// V30 FIX (Bug #8): We NO LONGER strip the "## Sources" / "## References"
+// sections — the V30 engine produces a proper Sources section with anchor
+// URLs (TRD FIELD 6) that MUST be visible on the article page. Wikipedia
+// shows sources, we beat Wikipedia, so we MUST show sources too.
+//
+// V30 FIX (Bug #9): Resolve {{AUDIO_PLAYER:xxx}} tokens inserted by the
+// V30 engine into actual audio player widgets. Without this, users would
+// see literal "{{AUDIO_PLAYER:abc123}}" text on the article page.
+//
+// We still clean up: reference markers [1], bare URL lines, META:/KEYWORDS:
+// lines, hash-like strings, and trailing metadata.
+function mdToHtml(text) {
+  if (!text) return '';
+  let t = text;
+
+  // V30 FIX (Bug #9): Replace audio player tokens BEFORE markdown conversion
+  // so the token doesn't interfere with ## heading detection.
+  // Token format: {{AUDIO_PLAYER:<id>}}
+  // Replaced with: a div placeholder that the page's renderArticle() will
+  // enhance later (it has access to the article's audio_url/audio_status).
+  // If no audio is available, the placeholder shows a "Generate Audio" button.
+  t = t.replace(/\{\{AUDIO_PLAYER:([a-f0-9]+)\}\}/g, (match, tokenId) => {
+    // The renderArticle() function will call enhanceAudioPlayerTokens()
+    // after rendering, which will replace this placeholder with a real
+    // audio player (using the article's audio_url/audio_status from the API).
+    return `<div class="article-audio-inline-placeholder" data-audio-token="${tokenId}">
+      <div class="article-audio-player">
+        <button class="audio-play-btn" onclick="generateAndPlayAudio()" id="audioGenBtn">&#9658;</button>
+        <span class="audio-label">&#127911; Suno (Listen)</span>
+        <span class="audio-loading" id="audioStatusText">Click play to generate audio for this article</span>
+      </div>
+    </div>`;
+  });
+
+  // V30 FIX: Removed the regex that stripped ## Sources / ## References
+  // sections. These are now FIRST-CLASS content per TRD FIELD 6.
+  // (The old regex was:
+  //   t.replace(/^#{1,3}\s*(Sources?|References?|...)\s*\n[\s\S]*?.../gim, '')
+  // )
+
+  // V19: Remove leftover META: and KEYWORDS: lines (already cleaned server-side,
+  // but double-protect for legacy articles already in DB)
+  t = t.replace(/^META:.*$/gm, '').replace(/^KEYWORDS:.*$/gm, '');
+
+  // V19: Remove reference markers like [1], [2], [^1], [citation needed]
+  t = t.replace(/\[\^?\d+(?:[-,\s\d]+)?\]/g, '');
+  t = t.replace(/\[citation needed\]/gi, '');
+  t = t.replace(/\[source needed\]/gi, '');
+
+  // V19: Remove bare URL-only lines (e.g. "https://cnn.com/..." on its own line)
+  t = t.replace(/^\s*https?:\/\/\S+\s*$/gm, '');
+
+  // V19: Remove long hash-like strings (40+ hex chars on their own line)
+  t = t.replace(/^\s*[a-f0-9]{32,}\s*$/gim, '');
+
+  // V19: Remove DOI-style references (e.g. "doi:10.xxxx/yyy")
+  t = t.replace(/^\s*doi:\s*\S+\s*$/gim, '');
+
+  // V19: Remove "Source: ..." and "Via ..." standalone lines
+  t = t.replace(/^\s*(Source|Via|Retrieved from|Available at):\s*\S.*$/gim, '');
+
+  // V19: Collapse 3+ blank lines into 2
+  t = t.replace(/\n{3,}/g, '\n\n').trim();
+
+  return t
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    // V32.1: Inline code spans (backticks) — must run before block code
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    // V32.1: Fenced code blocks ```lang\n...\n```
+    .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code class="language-$1">$2</code></pre>')
+    // V32.1: Markdown tables (| col1 | col2 | with separator row)
+    .replace(/^\|(.+)\|\n\|[-:\s|]+\|\n((?:\|.+\|\n?)+)/gm, (match, headerRow, bodyRows) => {
+      const headers = headerRow.split('|').map(h => h.trim()).filter(Boolean);
+      const rows = bodyRows.trim().split('\n').map(r =>
+        r.split('|').map(c => c.trim()).filter(Boolean)
+      );
+      const thead = '<thead><tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr></thead>';
+      const tbody = '<tbody>' + rows.map(r =>
+        '<tr>' + r.map(c => `<td>${c}</td>`).join('') + '</tr>'
+      ).join('') + '</tbody>';
+      return `<table>${thead}${tbody}</table>`;
+    })
+    // V32.1: Numbered lists — must run before unordered list handling
+    // V33 BUGFIX: The first regex produces `<oli data-num="1">...</oli>` (with
+    // an attribute), but the second regex matched only the literal `<oli>` tag
+    // (no attributes allowed). Result: numbered lists were never wrapped in <ol>
+    // and rendered as raw `<oli data-num="1">` text on the page. Fix: change
+    // the second regex to match `<oli[^>]*>` (oli tag with any attributes).
+    .replace(/^(\d+)\.\s+(.+)$/gm, '<oli data-num="$1">$2</oli>')
+    .replace(/(<oli[^>]*>.*<\/oli>\n?)+/gs, m => '<ol>' + m.replace(/<oli[^>]*>/g, '<li>').replace(/<\/oli>/g, '</li>') + '</ol>')
+    .replace(/^## (.+)$/gm, '<h2>$1</h2>')
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^#### (.+)$/gm, '<h4>$1</h4>')
+    .replace(/^# (.+)$/gm, '<h2>$1</h2>')
+    // V32.1: Internal links [text](/category/region) and external links [text](url)
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, (m, text, url) => {
+      const isInternal = url.startsWith('/') || url.startsWith(window.location.origin);
+      const safeUrl = url.replace(/"/g, '&quot;');
+      const target = isInternal ? '' : ' target="_blank" rel="noopener noreferrer nofollow"';
+      return `<a href="${safeUrl}"${target}>${text}</a>`;
+    })
+    // V32.1: Images ![alt](url)
+    .replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (m, alt, url) => {
+      const safeAlt = alt.replace(/"/g, '&quot;');
+      const safeUrl = url.replace(/"/g, '&quot;');
+      return `<figure><img src="${safeUrl}" alt="${safeAlt}" loading="lazy"><figcaption>${alt}</figcaption></figure>`;
+    })
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
+    .replace(/^- (.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>\n?)+/g, '<ul>$&</ul>')
+    // V32.1: Horizontal rule (---)
+    .replace(/^---+$/gm, '<hr>')
+    .split(/\n{2,}/)
+    .map(p => {
+      if (/^<(h[2-4]|ul|ol|blockquote|pre|table|hr|figure)/.test(p.trim())) return p.trim();
+      if (!p.trim()) return '';
+      return `<p>${p.trim().replace(/\n/g, '<br>')}</p>`;
+    })
+    .filter(Boolean)
+    .join('\n');
+}
+</script>
+</body>
+</html>

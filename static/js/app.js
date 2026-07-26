@@ -1,0 +1,1017 @@
+/* ============================================
+   SFAAM NEWS V8 - PREMIUM EDITION
+   Modern News Platform with Glass Morphism
+   ============================================ */
+
+const IS_FILE_PROTOCOL = window.location.protocol === 'file:';
+const API_BASE = '';
+
+if (IS_FILE_PROTOCOL) {
+  console.warn('Running via file:// protocol. Use a local server for full functionality.');
+}
+
+const CFG = (typeof SFAAM_CONFIG !== 'undefined') ? SFAAM_CONFIG : {};
+
+/* ============================================
+   THEME SYSTEM
+   ============================================ */
+function initTheme() {
+  const saved = localStorage.getItem('sfaam_theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  let theme = 'dark';
+  if (saved) {
+    theme = saved;
+  } else if (!prefersDark) {
+    theme = 'light';
+  }
+  document.documentElement.setAttribute('data-theme', theme);
+  return theme;
+}
+
+function cycleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  const themes = ['dark', 'light', 'sepia'];
+  const next = themes[(themes.indexOf(current) + 1) % themes.length];
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('sfaam_theme', next);
+  const icons = { dark: '\uD83C\uDF19', light: '\u2600\uFE0F', sepia: '\uD83D\uDCDC' };
+  const labels = { dark: 'Dark', light: 'Light', sepia: 'Sepia' };
+  const btn = document.getElementById('themeToggleBtn');
+  if (btn) {
+    btn.innerHTML = icons[next] || icons.dark;
+    btn.title = labels[next] + ' mode';
+    btn.setAttribute('aria-label', labels[next] + ' mode active');
+  }
+  // Update mobile theme button too
+  const mobileThemeBtn = document.getElementById('mobileThemeToggleBtn');
+  if (mobileThemeBtn) {
+    mobileThemeBtn.innerHTML = (icons[next] || icons.dark) + ' ' + labels[next] + ' Mode';
+  }
+  showToast(labels[next] + ' mode on');
+}
+
+window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+  if (!localStorage.getItem('sfaam_theme')) {
+    document.documentElement.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+  }
+});
+
+/* ============================================
+   TIME & READING UTILITIES
+   ============================================ */
+function readingTime(input) {
+  if (typeof input === 'number') return Math.max(1, input) + ' min read';
+  if (!input) return '1 min read';
+  return Math.max(1, Math.ceil(input.trim().split(/\s+/).length / 200)) + ' min read';
+}
+
+function fmtDate(d) {
+  if (!d) return '';
+  try {
+    return new Date(d).toLocaleDateString('en-US', {
+      day: 'numeric', month: 'short', year: 'numeric'
+    });
+  } catch (e) {
+    return String(d);
+  }
+}
+
+function fmtDateTime(d) {
+  if (!d) return '';
+  try {
+    const date = new Date(d);
+    const now = new Date();
+    const diff = Math.floor((now - date) / 1000);
+    if (diff < 60) return 'Just now';
+    if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+    if (diff < 86400) return Math.floor(diff / 3600) + 'h ago';
+    if (diff < 604800) return Math.floor(diff / 86400) + 'd ago';
+    return date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+  } catch (e) {
+    return String(d);
+  }
+}
+
+/* ============================================
+   READING PROGRESS BAR
+   ============================================ */
+function initProgressBar() {
+  const bar = document.getElementById('readingProgress');
+  if (!bar) return;
+  let ticking = false;
+  window.addEventListener('scroll', () => {
+    if (!ticking) {
+      requestAnimationFrame(() => {
+        const docH = document.documentElement.scrollHeight - window.innerHeight;
+        bar.style.width = docH > 0 ? (window.scrollY / docH * 100) + '%' : '0%';
+        ticking = false;
+      });
+      ticking = true;
+    }
+  }, { passive: true });
+}
+
+/* ============================================
+   SCROLL TO TOP
+   ============================================ */
+function initScrollTop() {
+  const btn = document.getElementById('scrollTopBtn');
+  if (!btn) return;
+  window.addEventListener('scroll', () => {
+    btn.classList.toggle('show', window.scrollY > 400);
+  }, { passive: true });
+  btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+}
+
+/* ============================================
+   BREAKING NEWS TICKER
+   ============================================ */
+function buildTicker(articles) {
+  if (!articles || !articles.length) return '';
+  const items = articles.slice(0, 10).map(a =>
+    `<span class="ticker-item" onclick="goArticle(${a.id},'${a.slug||''}')" role="link" tabindex="0" onkeydown="if(event.key==='Enter')goArticle(${a.id},'${a.slug||''}')">${esc(a.title)}</span><span class="ticker-sep" aria-hidden="true"> &#9679; </span>`
+  ).join('');
+  return `
+    <div class="ticker-wrap" aria-label="Breaking news ticker">
+      <div class="ticker-inner">
+        <div class="ticker-label">&#128308; LIVE</div>
+        <div class="ticker-track" id="tickerTrack">${items}${items}</div>
+      </div>
+    </div>`;
+}
+
+/* ============================================
+   SOCIAL ICONS (SVG-based with Telegram)
+   ============================================ */
+const SOCIAL_ICONS = {
+  facebook: '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.85c0-2.51 1.49-3.9 3.77-3.9 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.87h2.78l-.44 2.91h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94z"/></svg>',
+  twitter: '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M18.9 2H22l-7.6 8.7L23 22h-6.9l-5.4-7-6.2 7H1l8.2-9.3L1 2h7l4.9 6.4L18.9 2zm-1.2 18h1.9L7.4 4H5.4l12.3 16z"/></svg>',
+  instagram: '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 2c2.7 0 3.06.01 4.12.06 1.06.05 1.79.22 2.43.47.66.26 1.22.6 1.77 1.15.5.5.9 1.11 1.15 1.77.25.64.42 1.37.47 2.43C21.99 8.94 22 9.3 22 12s-.01 3.06-.06 4.12c-.05 1.06-.22 1.79-.47 2.43a4.9 4.9 0 0 1-1.15 1.77 4.9 4.9 0 0 1-1.77 1.15c-.64.25-1.37.42-2.43.47C15.06 21.99 14.7 22 12 22s-3.06-.01-4.12-.06c-1.06-.05-1.79-.22-2.43-.47a4.9 4.9 0 0 1-1.77-1.15 4.9 4.9 0 0 1-1.15-1.77c-.25-.64-.42-1.37-.47-2.43C2.01 15.06 2 14.7 2 12s.01-3.06.06-4.12c.05-1.06.22-1.79.47-2.43.26-.66.6-1.22 1.15-1.77a4.9 4.9 0 0 1 1.77-1.15c.64-.25 1.37-.42 2.43-.47C8.94 2.01 9.3 2 12 2zm0 1.8c-2.65 0-2.98.01-4.02.06-.86.04-1.33.18-1.64.3-.41.16-.71.35-1.02.66-.31.31-.5.61-.66 1.02-.12.31-.26.78-.3 1.64C4.31 8.02 4.3 8.35 4.3 11c0 2.65.01 2.98.06 4.02.04.86.18 1.33.3 1.64.16.41.35.71.66 1.02.31.31.61.5 1.02.66.31.12.78.26 1.64.3 1.04.05 1.37.06 4.02.06s2.98-.01 4.02-.06c.86-.04 1.33-.18 1.64-.3.41-.16.71-.35 1.02-.66.31-.31.5-.61.66-1.02.12-.31.26-.78.3-1.64.05-1.04.06-1.37.06-4.02s-.01-2.98-.06-4.02c-.04-.86-.18-1.33-.3-1.64a2.75 2.75 0 0 0-.66-1.02 2.75 2.75 0 0 0-1.02-.66c-.31-.12-.78-.26-1.64-.3C14.98 3.81 14.65 3.8 12 3.8zm0 3.05a5.15 5.15 0 1 1 0 10.3 5.15 5.15 0 0 1 0-10.3zm0 1.8a3.35 3.35 0 1 0 0 6.7 3.35 3.35 0 0 0 0-6.7zm5.35-1.99a1.2 1.2 0 1 1-2.4 0 1.2 1.2 0 0 1 2.4 0z"/></svg>',
+  youtube: '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M23.5 6.2a3.02 3.02 0 0 0-2.12-2.14C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.38.56A3.02 3.02 0 0 0 .5 6.2 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.8 3.02 3.02 0 0 0 2.12 2.14C4.5 20.5 12 20.5 12 20.5s7.5 0 9.38-.56a3.02 3.02 0 0 0 2.12-2.14A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.8zM9.6 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg>',
+  tiktok: '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M16.6 2h-3.2v13.2a2.8 2.8 0 1 1-2-2.68V9.2a6 6 0 1 0 5.2 5.95V8.4a7.6 7.6 0 0 0 4.4 1.4V6.6a4.4 4.4 0 0 1-4.4-4.4V2z"/></svg>',
+  telegram: '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>',
+  whatsapp: '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.29-1.39a9.87 9.87 0 0 0 4.7 1.2h.01c5.46 0 9.91-4.45 9.91-9.9 0-2.65-1.03-5.13-2.9-7-1.87-1.87-4.35-2.9-7-2.9zm0 18.13h-.01a8.2 8.2 0 0 1-4.18-1.14l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.37c0-4.53 3.7-8.22 8.24-8.22 2.2 0 4.27.86 5.82 2.42a8.16 8.16 0 0 1 2.41 5.81c0 4.53-3.7 8.21-8.23 8.21zm4.51-6.16c-.25-.12-1.47-.72-1.7-.81-.23-.08-.39-.12-.56.13-.17.24-.64.8-.79.97-.14.16-.29.18-.54.06-.25-.12-1.04-.38-1.99-1.22-.73-.66-1.23-1.46-1.37-1.71-.14-.25-.02-.38.11-.51.11-.11.25-.29.37-.43.12-.15.16-.25.24-.42.08-.16.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.42-.14-.01-.31-.01-.47-.01a.9.9 0 0 0-.66.31c-.22.25-.87.85-.87 2.06 0 1.22.89 2.4 1.02 2.56.12.16 1.75 2.67 4.24 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.55.1.47-.07 1.47-.6 1.68-1.18.2-.58.2-1.08.14-1.18-.06-.1-.22-.16-.47-.28z"/></svg>',
+  email: '<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M2 5.5A1.5 1.5 0 0 1 3.5 4h17A1.5 1.5 0 0 1 22 5.5v13a1.5 1.5 0 0 1-1.5 1.5h-17A1.5 1.5 0 0 1 2 18.5v-13zm2.2.5 7.8 5.9 7.8-5.9H4.2zM20 7.4l-7.5 5.7a1 1 0 0 1-1.2 0L4 7.4V18h16V7.4z"/></svg>'
+};
+
+function buildSocialIcons(size) {
+  const s = CFG.social || {};
+  const items = [
+    ['facebook', s.facebook], ['twitter', s.twitter], ['instagram', s.instagram],
+    ['youtube', s.youtube], ['tiktok', s.tiktok], ['telegram', s.telegram],
+    ['whatsapp', s.whatsapp], ['email', s.email]
+  ].filter(([, url]) => url && url !== '#');
+  const cls = size === 'lg' ? 'social-btn-lg' : '';
+  return items.map(([key, url]) =>
+    `<a href="${esc(url)}" class="${cls}" target="${key === 'email' ? '_self' : '_blank'}" rel="noopener noreferrer" aria-label="${key.charAt(0).toUpperCase() + key.slice(1)}">${SOCIAL_ICONS[key]}</a>`
+  ).join('');
+}
+
+/* ============================================
+   HEADER (with mobile-friendly design)
+   ============================================ */
+function buildHeader() {
+  const saved = localStorage.getItem('sfaam_theme') || 'dark';
+  const icons = { dark: '\uD83C\uDF19', light: '\u2600\uFE0F', sepia: '\uD83D\uDCDC' };
+  const labels = { dark: 'Dark', light: 'Light', sepia: 'Sepia' };
+  // V21: Bookmark count badge (visible everywhere)
+  const bookmarkCount = getBookmarkCount();
+  const bookmarkBadge = bookmarkCount > 0
+    ? `<span class="bookmark-count-badge" style="background:var(--orange);color:#fff;border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700;">${bookmarkCount}</span>`
+    : '';
+  return `
+    <a href="#main-content" class="skip-nav">Skip to main content</a>
+    <header class="header">
+      <div class="header-top">
+        <div class="logo-section">
+          <a href="/" aria-label="${CFG.siteName || 'SFAAM NEWS'} Home" class="logo-link">
+            <img src="${CFG.images?.logo || 'logo.png'}" alt="${CFG.siteName}" class="logo-img" width="40" height="40" fetchpriority="high"/>
+          </a>
+          <a href="/"><div class="logo-text">${CFG.siteName || 'SFAAM NEWS'}</div></a>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="searchInput" placeholder="Search news..." aria-label="Search news" onkeydown="if(event.key==='Enter')doSearch()"/>
+          <span class="search-icon" onclick="doSearch()" role="button" tabindex="0" aria-label="Search" onkeydown="if(event.key==='Enter')doSearch()">&#128269;</span>
+        </div>
+        <div class="header-actions">
+          <a href="/bookmarks.html" class="header-bookmark-link" aria-label="View saved articles" title="Your saved articles">
+            &#128218; ${bookmarkBadge}
+          </a>
+          <a href="/founder.html" class="founder-link" aria-label="Meet the Founder" title="Meet the Founder">
+            <img src="${CFG.images?.founderNav || 'images/founder-nav.png'}" alt="Founder" class="founder-btn-img" width="40" height="40" fetchpriority="high"/>
+          </a>
+          <button class="theme-toggle" id="themeToggleBtn" onclick="cycleTheme()" aria-label="Change theme" title="Change theme">${icons[saved] || icons.dark}</button>
+          <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileMenu()" aria-label="Open menu" aria-expanded="false">&#9776;</button>
+        </div>
+      </div>
+    </header>`;
+}
+
+/* ============================================
+   NAVIGATION (with Germany)
+   ============================================ */
+function buildNav(active) {
+  const tabs = [
+    { href: '/', label: 'Home' },
+    { href: '/category/world', label: 'World \uD83C\uDF0D' },
+    { href: '/category/usa', label: 'USA \uD83C\uDDFA\uD83C\uDDF8' },
+    { href: '/category/uk', label: 'UK \uD83C\uDDEC\uD83C\uDDE7' },
+    { href: '/category/pakistan', label: 'Pakistan \uD83C\uDDF5\uD83C\uDDF0' },
+    { href: '/category/india', label: 'India \uD83C\uDDEE\uD83C\uDDF3' },
+    { href: '/category/germany', label: 'Germany \uD83C\uDDE9\uD83C\uDDEA' },
+    { href: '/trends.html', label: 'Trends \uD83D\uDD25' },
+    { href: '/about.html', label: 'About' },
+    { href: '/contact.html', label: 'Contact' },
+  ];
+  const isActive = t => t.href === active || (t.href === '/' && (active === 'index.html' || active === ''));
+  const saved = localStorage.getItem('sfaam_theme') || 'dark';
+  const icons = { dark: '\uD83C\uDF19', light: '\u2600\uFE0F', sepia: '\uD83D\uDCDC' };
+  const labels = { dark: 'Dark', light: 'Light', sepia: 'Sepia' };
+  // V21: Bookmark count for mobile menu
+  const bookmarkCount = getBookmarkCount();
+  return `
+    <nav class="nav-tabs" id="mainNav" aria-label="Main navigation">
+      <div class="nav-tabs-inner">
+        ${tabs.map(t => `<a href="${t.href}" class="nav-tab${isActive(t) ? ' active' : ''}" ${isActive(t) ? 'aria-current="page"' : ''}>${t.label}</a>`).join('')}
+      </div>
+    </nav>
+    <div class="mobile-menu" id="mobileMenu" style="display:none;" aria-hidden="true">
+      ${tabs.map(t => `<a href="${t.href}" class="mobile-nav-link${isActive(t) ? ' active' : ''}">${t.label}</a>`).join('')}
+      <a href="/bookmarks.html" class="mobile-nav-link">&#128218; My Saved Articles ${bookmarkCount > 0 ? `(${bookmarkCount})` : ''}</a>
+      <a href="/founder.html" class="mobile-nav-link">&#128100; Meet the Founder</a>
+      <button class="mobile-nav-link mobile-theme-toggle" id="mobileThemeToggleBtn" onclick="cycleTheme()">${icons[saved] || icons.dark} ${labels[saved] || 'Dark'} Mode</button>
+    </div>`;
+}
+
+function toggleMobileMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const btn = document.getElementById('hamburgerBtn');
+  if (!menu) return;
+  const isOpen = menu.style.display === 'block';
+  menu.style.display = isOpen ? 'none' : 'block';
+  menu.setAttribute('aria-hidden', isOpen);
+  btn.innerHTML = isOpen ? '\u2630' : '\u2715';
+  btn.setAttribute('aria-expanded', !isOpen);
+}
+
+/* ============================================
+   BREADCRUMB
+   ============================================ */
+function buildBreadcrumb(items) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": items.map((item, i) => ({
+      "@type": "ListItem",
+      "position": i + 1,
+      "name": item.name,
+      "item": item.url
+    }))
+  };
+  // V32.1 BUGFIX: <script> tags injected via innerHTML do NOT execute
+  // and are NOT parsed as JSON-LD by Googlebot — the structured data was
+  // silently dropped, costing us rich-result eligibility in search.
+  // Fix: inject the breadcrumb HTML first, then append the JSON-LD
+  // script via createElement in the calling context (or use a unique
+  // placeholder and replace it after innerHTML is set). We use the
+  // placeholder approach so callers don't need to change.
+  const jsonLdId = 'breadcrumb-jsonld-' + Math.random().toString(36).slice(2, 9);
+  return `<nav class="breadcrumb" aria-label="Breadcrumb">
+    <span data-jsonld-id="${jsonLdId}" data-jsonld='${JSON.stringify(jsonLd).replace(/'/g, "&#39;")}'></span>
+    ${items.map((item, i) => i === items.length - 1
+      ? `<span aria-current="page">${esc(item.name)}</span>`
+      : `<a href="${item.url}">${esc(item.name)}</a> <span class="breadcrumb-sep">/</span>`
+    ).join('')}
+  </nav>`;
+}
+
+// V32.1: Companion function — call AFTER buildBreadcrumb's HTML is inserted
+// into the DOM. Walks all placeholders and converts them into proper
+// <script type="application/ld+json"> elements that Googlebot parses.
+function activateBreadcrumbJsonLd(root) {
+  const scope = root || document;
+  scope.querySelectorAll('span[data-jsonld-id]').forEach((ph) => {
+    try {
+      const raw = ph.getAttribute('data-jsonld');
+      if (!raw) return;
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      // Use textContent so the JSON is parsed, not interpreted as HTML.
+      script.textContent = raw;
+      ph.parentNode.replaceChild(script, ph);
+    } catch (e) { /* swallow — never break the page over JSON-LD */ }
+  });
+}
+
+/* ============================================
+   FOOTER (with Germany + all social icons)
+   ============================================ */
+function buildFooter() {
+  const year = new Date().getFullYear();
+  return `
+    <footer class="footer">
+      <div class="footer-inner">
+        <div>
+          <div class="footer-brand">
+            <img src="${CFG.images?.logo || 'logo.png'}" alt="${CFG.siteName}" class="logo-img" width="36" height="36" loading="lazy"/>
+            <div class="logo-text" style="font-size:18px;">${CFG.siteName}</div>
+          </div>
+          <p class="footer-desc">Trusted journalism from around the world. Breaking news, in-depth analysis, and exclusive reports from USA, UK, Pakistan, India, Germany and beyond.</p>
+          <div class="footer-social">
+            ${buildSocialIcons()}
+          </div>
+        </div>
+        <div>
+          <div class="footer-title">Regions</div>
+          <ul class="footer-links">
+            <li><a href="/category/world">World News</a></li>
+            <li><a href="/category/usa">USA News</a></li>
+            <li><a href="/category/uk">UK News</a></li>
+            <li><a href="/category/pakistan">Pakistan News</a></li>
+            <li><a href="/category/india">India News</a></li>
+            <li><a href="/category/germany">Germany News</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-title">Company</div>
+          <ul class="footer-links">
+            <li><a href="/about.html">About Us</a></li>
+            <li><a href="/founder.html">Meet the Founder</a></li>
+            <li><a href="/about.html#team">Editorial Team</a></li>
+            <li><a href="/bookmarks.html">My Saved Articles</a></li>
+            <li><a href="/contact.html">Contact</a></li>
+            <li><a href="/contact.html">Send News Tip</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-title">Legal</div>
+          <ul class="footer-links">
+            <li><a href="/privacy.html">Privacy Policy</a></li>
+            <li><a href="/terms.html">Terms of Use</a></li>
+            <li><a href="/cookies.html">Cookie Policy</a></li>
+            <li><a href="/corrections.html">Corrections</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div>&copy; ${year} ${CFG.siteName}. All rights reserved. | SFAAM Media Group | ${CFG.contact?.address || 'Bagrot, Gilgit-Baltistan, Pakistan'}</div>
+      </div>
+    </footer>`;
+}
+
+/* ============================================
+   ADS (Simplified - no more breaking news banner)
+   ============================================ */
+function buildAd(label) {
+  return '';
+}
+function buildAdWhite(label) {
+  return `<div class="ad-section-white"><div class="ad-label">${esc(label || 'Advertisement')}</div><div class="ad-content">Premium Ad Space &mdash; Reach millions of readers</div></div>`;
+}
+
+/* ============================================
+   NEWSLETTER BANNER
+   ============================================ */
+function buildNewsletter() {
+  return `
+    <div class="newsletter-banner">
+      <h3>&#128235; Get News in Your Inbox</h3>
+      <p>Breaking news delivered to you every morning. No spam, ever.</p>
+      <div class="newsletter-form">
+        <input type="email" id="nlEmail" placeholder="your@email.com" aria-label="Email for newsletter" onkeydown="if(event.key==='Enter')subscribeNewsletter()"/>
+        <button onclick="subscribeNewsletter()">Subscribe Free</button>
+      </div>
+      <div id="nlMsg" style="margin-top:12px;font-size:13px;display:none;"></div>
+    </div>`;
+}
+
+async function subscribeNewsletter(inputId = 'nlEmail', msgId = 'nlMsg') {
+  const email = document.getElementById(inputId)?.value?.trim();
+  const msg = document.getElementById(msgId);
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (msg) { msg.style.display = 'block'; msg.style.color = '#ef4444'; msg.textContent = 'Please enter a valid email address.'; }
+    return;
+  }
+  try {
+    const r = await fetch('/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const d = await r.json();
+    if (r.ok) {
+      if (msg) { msg.style.display = 'block'; msg.style.color = '#4ade80'; msg.textContent = '\u2705 Subscribed! Welcome to SFAAM NEWS.'; }
+      showToast('Subscribed successfully!');
+      document.getElementById(inputId).value = '';
+    } else {
+      throw new Error(d.detail || 'Failed');
+    }
+  } catch (e) {
+    if (msg) { msg.style.display = 'block'; msg.style.color = '#ef4444'; msg.textContent = 'Failed. Please try again later.'; }
+  }
+}
+
+/* ============================================
+   AD-BLOCKER FALLBACK
+   ============================================ */
+let _adBlockDetected = false;
+let _adBlockChecked = false;
+
+function initAdBlockFallback() {
+  if (_adBlockChecked) return;
+  _adBlockChecked = true;
+  const bait = document.createElement('div');
+  bait.className = 'adsbox ad-banner adsbygoogle ad-zone ad-slot text-ad banner-ads google-ad';
+  bait.style.cssText = 'position:absolute;top:-9999px;left:-9999px;width:2px;height:2px;';
+  bait.innerHTML = '&nbsp;';
+  document.body.appendChild(bait);
+
+  setTimeout(() => {
+    const blockedViaBait = !bait.offsetParent || bait.offsetHeight === 0 || getComputedStyle(bait).display === 'none' || getComputedStyle(bait).visibility === 'hidden';
+    bait.remove();
+    if (blockedViaBait) { _triggerAdBlockFallback(); return; }
+    const adSlots = document.querySelectorAll('.ad-section, .ad-section-white, [data-ad-slot]');
+    let allSlotsEmpty = adSlots.length > 0;
+    adSlots.forEach(slot => {
+      const realContent = slot.querySelector('iframe, ins, [id^="google_ads"]');
+      if (realContent && slot.offsetHeight > 10) allSlotsEmpty = false;
+    });
+    if (allSlotsEmpty) { _triggerAdBlockFallback(); return; }
+    _networkAdTest().then(blocked => { if (blocked) _triggerAdBlockFallback(); });
+  }, 600);
+}
+
+async function _networkAdTest() {
+  // V32.1 BUGFIX: The old implementation used mode:'no-cors' which makes
+  // fetch() return an OPAQUE response that ALWAYS resolves successfully —
+  // even when the request was blocked. The catch() branch only fired on
+  // network errors, not on ad-blocker-induced connection drops, so
+  // ad-block detection never triggered.
+  //
+  // The fix uses a normal CORS request and inspects the response. Ad
+  // blockers typically block the request entirely (TypeError: Failed to
+  // fetch) — that's the case we want to catch. We also check the response
+  // status; some blockers return a 204 from a local filter. Any non-2xx
+  // or fetch failure → ad blocker detected.
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 2500);
+    const r = await fetch('https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js', {
+      method: 'HEAD',
+      mode: 'cors',
+      signal: ctrl.signal,
+      cache: 'no-store',
+      credentials: 'omit',
+      redirect: 'error',
+    });
+    clearTimeout(t);
+    // A successful 2xx response means the ad script loaded → no blocker.
+    if (r.ok || (r.status >= 200 && r.status < 300)) return false;
+    // Non-2xx (e.g. 204 from local filter, 4xx from blocker proxy) → blocked.
+    return true;
+  } catch (e) {
+    // TypeError "Failed to fetch" is what ad blockers produce.
+    // AbortError from our timeout means the request hung → likely blocked.
+    return true;
+  }
+}
+
+function _triggerAdBlockFallback() {
+  if (_adBlockDetected) return;
+  _adBlockDetected = true;
+  if (typeof showToast === 'function') showToast('Premium newsletter enabled');
+  applyAdBlockFallback();
+}
+
+function applyAdBlockFallback() {
+  document.querySelectorAll('.ad-section, .ad-section-white, [data-ad-slot]').forEach((el, i) => {
+    if (el.dataset.adFallbackApplied) return;
+    el.dataset.adFallbackApplied = '1';
+    el.classList.add('ad-fallback-active');
+    el.style.border = 'none'; el.style.padding = '0'; el.style.background = 'transparent';
+    const inputId = `nlEmailAd${i}`, msgId = `nlMsgAd${i}`;
+    el.innerHTML = `
+      <div class="ad-fallback-newsletter">
+        <span class="premium-badge">&#11088; SFAAM Premium</span>
+        <h4>&#128235; Never Miss a Breaking Story</h4>
+        <p>Join <strong id="nlSubs${i}">12,400+</strong> readers getting the world&rsquo;s most important news in their inbox every morning. No noise. No spam. Just journalism that matters.</p>
+        <div class="newsletter-form">
+          <input type="email" id="${inputId}" placeholder="your@email.com" aria-label="Email for SFAAM newsletter" onkeydown="if(event.key==='Enter')subscribeNewsletterAd('${inputId}','${msgId}')"/>
+          <button onclick="subscribeNewsletterAd('${inputId}','${msgId}')">Subscribe Free</button>
+        </div>
+        <div class="trust-line">&#128274; Unsubscribe anytime &middot; &#128064; We never share your email</div>
+        <div id="${msgId}" style="margin-top:12px;font-size:13px;display:none;font-weight:600;color:#FFF6E0;"></div>
+      </div>`;
+  });
+}
+
+async function subscribeNewsletterAd(inputId, msgId) {
+  const input = document.getElementById(inputId);
+  const msg = document.getElementById(msgId);
+  if (!input || !msg) return;
+  const email = input.value.trim();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    msg.style.display = 'block'; msg.style.color = '#FFB3B3'; msg.textContent = '\u26A0 Please enter a valid email address.'; return;
+  }
+  msg.style.display = 'block'; msg.style.color = '#FFF6E0'; msg.textContent = 'Subscribing...';
+  try {
+    const r = await fetch('/api/subscribe', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) });
+    const d = await r.json();
+    if (r.ok) { msg.style.color = '#D4AF37'; msg.textContent = '\u2728 You\u2019re in! Check your inbox.'; input.value = ''; }
+    else { msg.style.color = '#FFB3B3'; msg.textContent = d.detail || 'Something went wrong. Please try again.'; }
+  } catch (e) { msg.style.color = '#FFB3B3'; msg.textContent = 'Network error. Please try again.'; }
+}
+
+/* ============================================
+   SKELETON CARDS
+   ============================================ */
+function buildSkeletonCard() {
+  return `<article class="news-card skeleton-card" aria-hidden="true">
+    <div class="skeleton-image"></div>
+    <div class="news-content">
+      <div class="skeleton-line skeleton-line-short"></div>
+      <div class="skeleton-line"></div>
+      <div class="skeleton-line"></div>
+      <div class="skeleton-line skeleton-line-short"></div>
+    </div>
+  </article>`;
+}
+
+/* ============================================
+   NEWS CARD
+   V22: Reverted to ORIGINAL article images (founder request — logo was not desired)
+   ============================================ */
+function buildNewsCard(a) {
+  // Use image proxy for article images + show placeholder on error
+  const imgHtml = a.image_url
+    ? `<div class="news-image-wrap"><img src="/api/imgproxy?url=${encodeURIComponent(a.image_url)}&w=600" alt="${esc(a.title)}" loading="lazy" width="400" height="200" onerror="this.parentElement.innerHTML='<div class=&quot;news-image-ph&quot;>&#128240;</div>'"/><span class="news-badge">${esc((a.region || 'NEWS').toUpperCase())}</span></div>`
+    : `<div class="news-image-ph">&#128240;</div>`;
+  const time = readingTime(a.reading_time ?? a.ai_content ?? a.summary ?? '');
+  const dateStr = fmtDateTime(a.date);
+  return `
+    <article class="news-card" onclick="goArticle(${a.id},'${a.slug||''}')" role="link" tabindex="0" onkeydown="if(event.key==='Enter')goArticle(${a.id},'${a.slug||''}')" aria-label="${esc(a.title)}">
+      ${imgHtml}
+      <div class="news-content">
+        <div class="news-category">${esc((a.region || 'NEWS').toUpperCase())} &middot; <time datetime="${a.date}">${dateStr}</time></div>
+        <h3 class="news-title">${esc(a.title)}</h3>
+        <p class="news-excerpt">${esc((a.summary || '').substring(0, 120))}${(a.summary || '').length > 120 ? '...' : ''}</p>
+        <div class="news-meta">
+          <span class="reading-time">${time}</span>
+          <span class="read-more">Read More &rarr;</span>
+        </div>
+      </div>
+    </article>`;
+}
+
+/* ============================================
+   HERO CARD
+   V22: Reverted to ORIGINAL article images
+   ============================================ */
+function buildHeroCard(a) {
+  // Use image proxy for hero image + show placeholder on error
+  const imgHtml = a.image_url
+    ? `<img class="hero-image" src="/api/imgproxy?url=${encodeURIComponent(a.image_url)}&w=1200&q=90" alt="${esc(a.title)}" loading="eager" fetchpriority="high" width="1200" height="420" onerror="this.outerHTML='<div class=&quot;hero-image-ph&quot;>&#128240;</div>'">`
+    : `<div class="hero-image-ph">&#128240;</div>`;
+  const time = readingTime(a.reading_time ?? a.ai_content ?? a.summary ?? '');
+  const dateStr = fmtDateTime(a.date);
+  return `
+    <div class="hero-card" onclick="goArticle(${a.id},'${a.slug||''}')" role="link" tabindex="0" onkeydown="if(event.key==='Enter')goArticle(${a.id},'${a.slug||''}')">
+      ${imgHtml}
+      <div class="hero-body">
+        <div class="hero-category"><span class="live-indicator"><span class="live-dot"></span>LIVE</span> &middot; ${esc((a.region || '').toUpperCase())} &middot; <time datetime="${a.date}">${dateStr}</time></div>
+        <h1 class="hero-title">${esc(a.title)}</h1>
+        <p class="hero-excerpt">${esc((a.summary || '').substring(0, 200))}</p>
+        <div style="display:flex;gap:16px;align-items:center;">
+          <span class="reading-time">${time}</span>
+          <span class="read-more">Read Full Story &rarr;</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ============================================
+   INFINITE SCROLL
+   ============================================ */
+function initInfiniteScroll(region, gridId) {
+  let page = 1, loading = false, exhausted = false;
+  const PER_PAGE = 12;
+  const grid = document.getElementById(gridId);
+  if (!grid) return;
+
+  // V32: If the server already rendered article cards (data-server-rendered="1"),
+  // skip the skeleton screen + first-page fetch — start from page 2.
+  const serverRendered = grid.getAttribute('data-server-rendered') === '1';
+  if (serverRendered) {
+    page = 2;  // server gave us page 1, JS fetches page 2+
+    // If the server rendered fewer than PER_PAGE cards, there are no more pages.
+    if (grid.children.length < PER_PAGE) {
+      exhausted = true;
+    }
+  } else {
+    // No server rendering — show skeleton cards while we fetch page 1
+    grid.innerHTML = Array(6).fill(0).map(() => buildSkeletonCard()).join('');
+  }
+
+  const spinner = document.createElement('div');
+  spinner.id = 'infiniteSpinner';
+  spinner.style.cssText = 'grid-column:1/-1;text-align:center;padding:32px;min-height:1px;opacity:0;transition:opacity 0.2s;';
+  spinner.innerHTML = `<div style="width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--orange);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 12px;" role="status"><span class="sr-only">Loading...</span></div><p style="color:var(--text-muted);font-size:14px;">Loading more stories...</p>`;
+  grid.after(spinner);
+
+  const endMsg = document.createElement('div');
+  endMsg.style.cssText = 'text-align:center;padding:24px;color:var(--text-muted);font-size:14px;display:none;';
+  endMsg.innerHTML = `You've reached the end. <a href="/" style="color:var(--orange);">Back to top &uarr;</a>`;
+  spinner.after(endMsg);
+
+  async function loadPage() {
+    if (loading || exhausted) return;
+    loading = true;
+    spinner.style.opacity = '1';
+    try {
+      const r = await fetch(`/api/articles?page=${page}${region ? '&region=' + region : ''}&per_page=${PER_PAGE}`);
+      if (!r.ok) throw new Error('Failed');
+      const arts = await r.json();
+      // V32: Only clear skeleton on page 1 (server-rendered mode skips this)
+      if (page === 1 && !serverRendered) grid.innerHTML = '';
+      if (!arts.length) {
+        exhausted = true;
+        spinner.style.opacity = '0';
+        if (page > 1) endMsg.style.display = 'block';
+        else if (!serverRendered) grid.innerHTML = `<div class="news-card" style="grid-column:1/-1;padding:40px;text-align:center;"><p style="color:var(--text-muted);">No stories yet. Check back soon!</p></div>`;
+      } else {
+        arts.forEach(a => { const d = document.createElement('div'); d.innerHTML = buildNewsCard(a); grid.appendChild(d.firstElementChild); });
+        page++;
+        if (arts.length < PER_PAGE) { exhausted = true; spinner.style.opacity = '0'; endMsg.style.display = 'block'; }
+        else spinner.style.opacity = '0';
+      }
+    } catch (e) {
+      if (page === 1 && !serverRendered) {
+        grid.innerHTML = '';
+        const arts = getDemoArticles(region, PER_PAGE);
+        arts.forEach(a => { const d = document.createElement('div'); d.innerHTML = buildNewsCard(a); grid.appendChild(d.firstElementChild); });
+        exhausted = true; spinner.style.opacity = '0';
+      }
+    }
+    loading = false;
+  }
+  new IntersectionObserver(entries => { if (entries[0].isIntersecting) loadPage(); }, { rootMargin: '200px' }).observe(spinner);
+  // V32: Only auto-fetch page 1 if the server didn't render articles.
+  // If server-rendered, page starts at 2 and we wait for scroll to trigger.
+  if (!serverRendered) {
+    loadPage();
+  }
+}
+
+/* ============================================
+   BOOKMARKS
+   V21: Now includes a visible badge counter on every page header so
+   users always know where their saved articles are.
+   ============================================ */
+function toggleBookmark(id) {
+  let bm = JSON.parse(localStorage.getItem('sfaam_bookmarks') || '[]');
+  const idx = bm.indexOf(id);
+  if (idx > -1) { bm.splice(idx, 1); showToast('Removed from saved articles'); }
+  else { bm.push(id); showToast('\u2B50 Saved! View in My Saved'); }
+  localStorage.setItem('sfaam_bookmarks', JSON.stringify(bm));
+  updateBookmarkBtn(id);
+  updateBookmarkBadge();
+}
+function isBookmarked(id) { return (JSON.parse(localStorage.getItem('sfaam_bookmarks') || '[]')).includes(id); }
+function updateBookmarkBtn(id) {
+  const btn = document.getElementById('bookmarkBtn');
+  if (btn) { btn.innerHTML = isBookmarked(id) ? '\u2B50 Saved' : '\u2606 Save for Later'; btn.className = 'bookmark-btn' + (isBookmarked(id) ? ' active' : ''); }
+}
+
+// V21: Update the bookmark count badge in the nav across all pages
+function updateBookmarkBadge() {
+  let bm = [];
+  try { bm = JSON.parse(localStorage.getItem('sfaam_bookmarks') || '[]'); } catch (e) { bm = []; }
+  const badges = document.querySelectorAll('#navBookmarkCount, .bookmark-count-badge');
+  badges.forEach(badge => {
+    if (bm.length > 0) {
+      badge.textContent = bm.length;
+      badge.style.display = 'inline-block';
+    } else {
+      badge.style.display = 'none';
+    }
+  });
+}
+
+// V21: Get bookmark count for use elsewhere
+function getBookmarkCount() {
+  try { return JSON.parse(localStorage.getItem('sfaam_bookmarks') || '[]').length; }
+  catch (e) { return 0; }
+}
+
+/* ============================================
+   FONT SIZE CONTROLS
+   V21: Fixed — now uses CSS variable so it works on ALL screen sizes
+   (was broken on mobile because old code only set element.style.fontSize
+   which got overridden by @media query !important rules)
+   ============================================ */
+let currentFontSize = 18;
+function initFontControls() {
+  const saved = localStorage.getItem('sfaam_fontsize');
+  if (saved) { currentFontSize = parseInt(saved); }
+  applyFontSize();
+}
+function changeFontSize(delta) {
+  currentFontSize = Math.max(14, Math.min(26, currentFontSize + delta));
+  localStorage.setItem('sfaam_fontsize', currentFontSize);
+  applyFontSize();
+  const lbl = document.getElementById('fontSizeLabel');
+  if (lbl) lbl.textContent = currentFontSize + 'px';
+}
+function applyFontSize() {
+  // V21: Set CSS variable on <html> — applies everywhere, beats @media queries
+  document.documentElement.style.setProperty('--article-font-size', currentFontSize + 'px');
+  // Also set directly on article body (belt + suspenders — works even without CSS var support)
+  const body = document.querySelector('.article-body-full');
+  if (body) body.style.fontSize = currentFontSize + 'px';
+  // Also apply to TL;DR content for consistency
+  const tldr = document.querySelector('.tldr-content');
+  if (tldr) tldr.style.fontSize = (currentFontSize - 2) + 'px';
+}
+function buildFontControls() {
+  return `<div class="font-controls" role="group" aria-label="Font size controls">
+    <span style="font-size:13px;color:var(--text-muted);">Text Size:</span>
+    <button class="font-btn" onclick="changeFontSize(-2)" aria-label="Decrease font size">A&minus;</button>
+    <span class="font-size-label" id="fontSizeLabel">${currentFontSize}px</span>
+    <button class="font-btn" onclick="changeFontSize(2)" aria-label="Increase font size">A+</button>
+  </div>`;
+}
+
+/* ============================================
+   AI QUICK SUMMARY
+   ============================================ */
+function buildAiSummaryBox() {
+  return `<div class="ai-summary" id="aiSummaryBox">
+    <div class="ai-summary-header">
+      <span class="ai-summary-icon">&#9889;</span>
+      <span class="ai-summary-title">Quick Summary</span>
+      <span class="ai-summary-badge">AI</span>
+    </div>
+    <ul class="ai-summary-list" id="aiSummaryList"><li class="ai-summary-loading">Generating summary...</li></ul>
+  </div>`;
+}
+function generateAiSummary(bodyText) {
+  const list = document.getElementById('aiSummaryList');
+  if (!list || !bodyText) return;
+  const sentences = bodyText.replace(/#+\s*/g, '').replace(/\*\*/g, '').replace(/\*/g, '').split(/[.!?]+/).map(s => s.trim()).filter(s => s.length > 60);
+  const points = [];
+  const indices = [0, Math.floor(sentences.length * 0.25), Math.floor(sentences.length * 0.5)];
+  indices.forEach(i => { if (sentences[i]) points.push(sentences[i]); });
+  if (!points.length) { const box = document.getElementById('aiSummaryBox'); if (box) box.remove(); return; }
+  list.innerHTML = points.map(p => `<li>${esc(p.substring(0, 180))}.</li>`).join('');
+}
+
+/* ============================================
+   V18: WIKIPEDIA-KILLER FEATURES
+   - TL;DR Quick Summary (Deep Read vs Quick Summary toggle)
+   - Fact-Check Status Badges
+   - Audio Player (TTS)
+   ============================================ */
+
+function buildFactCheckBadge(status) {
+  // V18: Dynamic fact-check badge based on article status
+  const statusMap = {
+    'verified': { class: 'verified', icon: '&#10003;', label: 'Verified' },
+    'under_review': { class: 'under-review', icon: '&#9888;', label: 'Under Review' },
+    'community_fact_checked': { class: 'community-checked', icon: '&#128270;', label: 'Community Fact-Checked' }
+  };
+  const s = statusMap[status] || statusMap['under_review'];
+  return `<span class="fact-check-badge ${s.class}">${s.icon} ${s.label}</span>`;
+}
+
+function buildTldrSection(tldrSummary) {
+  // V18: TL;DR toggle — "Deep Read" (full article) vs "Quick Summary" (3 bullets)
+  // If no TL;DR available, hide the section entirely
+  if (!tldrSummary || !tldrSummary.trim()) return '';
+  const bullets = tldrSummary.split('\n').filter(l => l.trim()).map(l => {
+    const text = l.replace(/^[•\-*]\s*/, '').trim();
+    return `<li>${esc(text)}</li>`;
+  }).join('');
+  if (!bullets) return '';
+  return `<section class="tldr-section" id="tldrSection">
+    <div class="tldr-header">
+      <span class="tldr-title">&#9889; Reading Mode</span>
+      <div class="tldr-toggle-group" role="group" aria-label="Reading mode toggle">
+        <button class="tldr-toggle-btn active" id="tldrQuickBtn" onclick="setTldrMode('quick')" aria-pressed="true">Quick Summary</button>
+        <button class="tldr-toggle-btn" id="tldrDeepBtn" onclick="setTldrMode('deep')" aria-pressed="false">Deep Read</button>
+      </div>
+    </div>
+    <div class="tldr-content" id="tldrQuickContent">
+      <ul>${bullets}</ul>
+    </div>
+  </section>`;
+}
+
+function setTldrMode(mode) {
+  const quickBtn = document.getElementById('tldrQuickBtn');
+  const deepBtn = document.getElementById('tldrDeepBtn');
+  const quickContent = document.getElementById('tldrQuickContent');
+  const articleBody = document.getElementById('articleBody');
+  if (!quickBtn || !deepBtn) return;
+  if (mode === 'quick') {
+    quickBtn.classList.add('active');
+    deepBtn.classList.remove('active');
+    quickBtn.setAttribute('aria-pressed', 'true');
+    deepBtn.setAttribute('aria-pressed', 'false');
+    if (quickContent) quickContent.style.display = '';
+    if (articleBody) articleBody.style.display = 'none';
+  } else {
+    quickBtn.classList.remove('active');
+    deepBtn.classList.add('active');
+    quickBtn.setAttribute('aria-pressed', 'false');
+    deepBtn.setAttribute('aria-pressed', 'true');
+    if (quickContent) quickContent.style.display = 'none';
+    if (articleBody) articleBody.style.display = '';
+  }
+}
+
+function buildAudioPlayer(audioUrl, audioStatus) {
+  // V22: ORANGE Audio Player with on-demand TTS generation
+  // The generateAndPlayAudio() function is defined GLOBALLY (in app.js init)
+  // so it works when called via onclick (innerHTML <script> tags don't execute)
+  if (audioStatus === 'ready' && audioUrl) {
+    return `<div class="article-audio-player">
+      <span class="audio-label">&#127911; Suno (Listen)</span>
+      <audio controls preload="none" loading="lazy">
+        <source src="${esc(audioUrl)}" type="audio/mpeg">
+        Your browser does not support audio.
+      </audio>
+    </div>`;
+  } else if (audioStatus === 'processing') {
+    return `<div class="article-audio-player">
+      <button class="audio-play-btn" disabled>&#8987;</button>
+      <span class="audio-label">&#127911; Suno (Listen)</span>
+      <span class="audio-loading">Audio is being generated...</span>
+    </div>`;
+  }
+  // V22: Show a "Generate Audio" button by default (audio not yet created)
+  // User clicks it -> calls generateAndPlayAudio() (global function)
+  return `<div class="article-audio-player" id="audioPlayerWrap">
+    <button class="audio-play-btn" onclick="generateAndPlayAudio()" id="audioGenBtn">&#9658;</button>
+    <span class="audio-label">&#127911; Suno (Listen)</span>
+    <span class="audio-loading" id="audioStatusText">Click play to generate audio for this article</span>
+  </div>`;
+}
+
+// V22: Global function for audio generation (called from onclick attribute)
+// Must be global so it's accessible from inline onclick handlers
+async function generateAndPlayAudio() {
+  const btn = document.getElementById('audioGenBtn');
+  const statusText = document.getElementById('audioStatusText');
+  const wrap = document.getElementById('audioPlayerWrap');
+  if (!btn || !window._articleIdForAudio) return;
+  btn.disabled = true;
+  btn.innerHTML = '&#8987;';
+  if (statusText) statusText.textContent = 'Generating audio... (this takes ~10-20 seconds)';
+  try {
+    const r = await fetch('/api/articles/' + window._articleIdForAudio + '/generate-audio', { method: 'POST' });
+    const d = await r.json();
+    if (r.ok && d.status === 'ready' && d.audio_url) {
+      // Replace with full audio player
+      if (wrap) {
+        wrap.innerHTML = '<span class="audio-label">&#127911; Suno (Listen)</span>' +
+          '<audio controls autoplay preload="auto"><source src="' + d.audio_url + '" type="audio/mpeg">Your browser does not support audio.</audio>';
+      }
+    } else {
+      if (statusText) statusText.textContent = d.detail || 'Failed to generate audio. Please try again later.';
+      btn.disabled = false;
+      btn.innerHTML = '&#9658;';
+    }
+  } catch (e) {
+    if (statusText) statusText.textContent = 'Network error. Please try again.';
+    btn.disabled = false;
+    btn.innerHTML = '&#9658;';
+  }
+}
+
+/* ============================================
+   COPY LINK & SHARE
+   ============================================ */
+function copyLink() {
+  navigator.clipboard.writeText(window.location.href)
+    .then(() => showToast('Link copied! \uD83D\uDD17'))
+    .catch(() => { const ta = document.createElement('textarea'); ta.value = window.location.href; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); showToast('Link copied!'); });
+}
+
+/* ============================================
+   UTILITIES
+   ============================================ */
+function goArticle(id, slug) { window.location.href = slug ? `/article/${encodeURIComponent(slug)}` : `/article/${id}`; }
+function doSearch() {
+  const q = document.getElementById('searchInput')?.value?.trim();
+  if (q) window.location.href = `/search.html?q=${encodeURIComponent(q)}`;
+}
+function showToast(msg) {
+  let t = document.getElementById('toast');
+  if (!t) { t = document.createElement('div'); t.id = 'toast'; t.className = 'toast'; t.setAttribute('role', 'status'); t.setAttribute('aria-live', 'polite'); document.body.appendChild(t); }
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._timer); t._timer = setTimeout(() => t.classList.remove('show'), 3500);
+}
+// V32.1 BUGFIX: The old esc() used textContent/innerHTML which only escapes
+// <, >, &. It did NOT escape " or ' — meaning any title/slug with a quote
+// would break alt="...", aria-label="...", and onclick="..." interpolations.
+// Worse, it created an XSS vector when interpolated into attribute strings.
+// We now also escape double and single quotes. We also avoid creating a
+// fresh DOM element per call (was causing hundreds of orphan <div>s per
+// render) by using a cached element.
+const _ESC_DIV = document.createElement('div');
+function esc(s) {
+  if (s == null) return '';
+  const str = String(s);
+  _ESC_DIV.textContent = str;
+  return _ESC_DIV.innerHTML
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+/* ============================================
+   SERVICE WORKER
+   ============================================ */
+function registerServiceWorker() {
+  if ('serviceWorker' in navigator && !IS_FILE_PROTOCOL) {
+    navigator.serviceWorker.register('/sw.js').then(() => console.log('[SFAAM] SW registered')).catch(e => console.log('[SFAAM] SW failed:', e));
+  }
+}
+
+/* ============================================
+   ANALYTICS
+   ============================================ */
+function loadAnalytics() {
+  if (CFG.analytics?.enabled && CFG.analytics.src && !IS_FILE_PROTOCOL) {
+    const s = document.createElement('script'); s.defer = true; s.setAttribute('data-domain', CFG.analytics.domain); s.src = CFG.analytics.src; document.head.appendChild(s);
+  }
+  if (CFG.analytics?.gaId && !IS_FILE_PROTOCOL) {
+    const s1 = document.createElement('script'); s1.async = true; s1.src = `https://www.googletagmanager.com/gtag/js?id=${CFG.analytics.gaId}`; document.head.appendChild(s1);
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    window.gtag = gtag; gtag('js', new Date()); gtag('config', CFG.analytics.gaId);
+  }
+}
+
+/* ============================================
+   PUSH NOTIFICATIONS
+   ============================================ */
+function requestPushPermission() {
+  if ('Notification' in window && 'serviceWorker' in navigator) {
+    Notification.requestPermission().then(permission => { if (permission === 'granted') console.log('[SFAAM] Push notifications enabled'); });
+  }
+}
+
+/* ============================================
+   SPIN ANIMATION
+   ============================================ */
+(function () { const st = document.createElement('style'); st.textContent = '@keyframes spin{to{transform:rotate(360deg)}}'; document.head.appendChild(st); })();
+
+/* ============================================
+   INIT
+   ============================================ */
+document.addEventListener('DOMContentLoaded', () => {
+  initTheme(); registerServiceWorker(); loadAnalytics(); initProgressBar(); initScrollTop();
+});
+
+/* ============================================
+   DEMO DATA
+   ============================================ */
+const DEMO_ARTICLES = [
+  { id: 1, title: "Global Markets Rally as Inflation Data Shows Improvement", summary: "Stock markets worldwide surged today as latest inflation figures came in lower than expected, signaling potential end to aggressive rate hikes.", ai_content: "Stock markets worldwide surged today...", image_url: "", region: "world", views: 1250, date: new Date().toISOString(), meta_desc: "Global markets rally on positive inflation data", keywords: "markets, inflation, economy, stocks" },
+  { id: 2, title: "US Senate Passes Historic Climate Bill", summary: "In a landmark vote, the US Senate has passed comprehensive climate legislation aimed at reducing carbon emissions by 40% by 2030.", ai_content: "The United States Senate passed a historic climate bill today...", image_url: "", region: "usa", views: 890, date: new Date(Date.now() - 3600000).toISOString(), meta_desc: "US Senate passes climate legislation", keywords: "climate, senate, usa, legislation" },
+  { id: 3, title: "UK Government Announces New Healthcare Funding", summary: "The British government has pledged an additional \u00A320 billion for the National Health Service over the next five years.", ai_content: "UK government announces major healthcare funding boost...", image_url: "", region: "uk", views: 650, date: new Date(Date.now() - 7200000).toISOString(), meta_desc: "UK healthcare funding increase announced", keywords: "uk, healthcare, nhs, funding" },
+  { id: 4, title: "Pakistan Cricket Team Wins T20 Series Against Australia", summary: "In a thrilling finale, Pakistan defeated Australia by 5 wickets to clinch the T20 series 3-2 at Gaddafi Stadium.", ai_content: "Pakistan cricket team celebrates series victory...", image_url: "", region: "pakistan", views: 2100, date: new Date(Date.now() - 10800000).toISOString(), meta_desc: "Pakistan wins cricket series", keywords: "pakistan, cricket, australia, sports" },
+  { id: 5, title: "India Launches New Space Mission to Mars", summary: "ISRO successfully launched its second Mars mission today, aiming to study the red planet's atmosphere and search for signs of water.", ai_content: "India's space agency ISRO launched a new mission to Mars...", image_url: "", region: "india", views: 3400, date: new Date(Date.now() - 14400000).toISOString(), meta_desc: "India launches Mars mission", keywords: "india, space, mars, isro" },
+  { id: 6, title: "Germany Unveils Ambitious Green Energy Plan", summary: "The German government announced a comprehensive \u20AC100 billion green energy transition plan aimed at achieving carbon neutrality by 2035.", ai_content: "Germany announces major green energy initiative...", image_url: "", region: "germany", views: 1800, date: new Date(Date.now() - 18000000).toISOString(), meta_desc: "Germany green energy plan announced", keywords: "germany, green energy, climate, eu" }
+];
+
+function getDemoArticles(region, count) {
+  let articles = region ? DEMO_ARTICLES.filter(a => a.region === region) : [...DEMO_ARTICLES];
+  const regions = ['world', 'usa', 'uk', 'pakistan', 'india', 'germany'];
+  const titles = [
+    "Breaking: Major Policy Shift Announced by Government",
+    "Economic Growth Exceeds Expectations in Latest Quarter",
+    "New Technology Breakthrough Promises to Transform Industry",
+    "International Summit Reaches Historic Agreement",
+    "Sports: Championship Finals Set for Weekend Showdown",
+    "Health Officials Issue New Guidelines for Public Safety",
+    "Education Reform Bill Sparks National Debate",
+    "Infrastructure Project to Create Thousands of Jobs"
+  ];
+  for (let i = 0; i < count; i++) {
+    const r = region || regions[i % regions.length];
+    articles.push({
+      id: 100 + i,
+      title: titles[i % titles.length] + (i > 7 ? ` (${Math.floor(i / 8) + 1})` : ''),
+      summary: `Latest breaking news from ${r}. Stay updated with SFAAM NEWS for comprehensive coverage.`,
+      ai_content: "Full article content would appear here when connected to the server...",
+      image_url: "", region: r,
+      views: Math.floor(Math.random() * 5000) + 100,
+      date: new Date(Date.now() - i * 3600000).toISOString(),
+      meta_desc: "Latest news update", keywords: "news, update, breaking"
+    });
+  }
+  return articles.slice(0, count);
+}
+
+document.addEventListener('DOMContentLoaded', () => { setTimeout(initAdBlockFallback, 800); });

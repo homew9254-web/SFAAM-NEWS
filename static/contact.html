@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>Contact Us &mdash; SFAAM NEWS</title>
+<meta name="description" content="Contact the SFAAM NEWS editorial team. Send news tips, feedback, or advertising inquiries."/>
+<meta name="robots" content="index, follow"/>
+<link rel="icon" type="image/png" href="logo.png"/>
+<link rel="apple-touch-icon" href="logo.png"/>
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#D97757"/>
+<meta name="msapplication-TileColor" content="#D97757"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="css/style.css"/>
+<link rel="canonical" href="https://sfaamnews.com/contact.html"/>
+</head>
+<body>
+<a href="#main-content" class="skip-nav">Skip to main content</a>
+<div id="headerWrap"></div>
+<div id="navWrap"></div>
+<main id="main-content">
+<div class="contact-hero-claude"><h1>Contact Us</h1><p>Reach out to our editorial team. We read every message.</p></div>
+<div class="contact-grid-claude">
+  <div class="contact-form-claude">
+    <h2>Send a Message</h2>
+    <div class="form-row"><label for="cName">Your Name *</label><input type="text" id="cName" placeholder="Full name" minlength="2" maxlength="100" required/></div>
+    <div class="form-row"><label for="cEmail">Email Address *</label><input type="email" id="cEmail" placeholder="your@email.com" required/></div>
+    <div class="form-row"><label for="cSubject">Subject</label><select id="cSubject"><option>General Inquiry</option><option>News Tip</option><option>Advertising</option><option>Partnership</option><option>Technical Issue</option><option>Correction</option></select></div>
+    <div class="form-row"><label for="cMessage">Message *</label><textarea id="cMessage" placeholder="Write your message..." minlength="10" maxlength="5000" required></textarea></div>
+    <button class="btn-submit" id="submitBtn" onclick="submitForm()">Send Message &rarr;</button>
+    <div id="loadingMsg" style="display:none;margin-top:16px;text-align:center;color:var(--text-muted);font-size:14px;">Sending...</div>
+    <div id="successMsg" style="display:none;margin-top:16px;padding:16px;background:rgba(74,222,128,0.1);border:1px solid rgba(74,222,128,0.3);border-radius:8px;color:#4ade80;font-size:14px;">&#9989; Thank you! Our editorial team received your message and will respond within 24 hours.</div>
+    <div id="errorMsg" style="display:none;margin-top:16px;padding:16px;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;color:#ef4444;font-size:14px;">&#10060; Failed to send. Please email us at <a href="mailto:editorial@sfaamnews.com" style="color:#ef4444;text-decoration:underline;">editorial@sfaamnews.com</a></div>
+    <div id="rateLimitMsg" style="display:none;margin-top:16px;padding:16px;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.3);border-radius:8px;color:#f59e0b;font-size:14px;">&#9888; Too many submissions. Please try again later.</div>
+  </div>
+  <div class="contact-info-claude">
+    <div class="info-box-claude"><h3>&#9993; Editorial Team</h3><p>For news tips, corrections, and general inquiries.</p><a href="mailto:editorial@sfaamnews.com" class="info-btn info-btn-orange">editorial@sfaamnews.com</a></div>
+    <div class="info-box-claude"><h3>&#128172; WhatsApp</h3><p>Quick responses for urgent news tips.</p><a href="https://wa.me/923431188853" target="_blank" rel="noopener noreferrer" class="info-btn info-btn-green">+92 343 1188853</a></div>
+    <div class="info-box-claude"><h3>&#128226; Advertising</h3><p>Reach millions of engaged readers.</p><a href="mailto:ads@sfaamnews.com" class="info-btn info-btn-orange">ads@sfaamnews.com</a></div>
+    <div class="info-box-claude"><h3>&#128205; Office</h3><p>SFAAM Media House<br/>Bagrot, Gilgit-Baltistan, Pakistan</p></div>
+  </div>
+</div>
+</main>
+<div id="footerWrap"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="js/config.js"></script>
+<script src="js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('headerWrap').innerHTML = buildHeader();
+  document.getElementById('navWrap').innerHTML    = buildNav('/contact.html');
+  document.getElementById('footerWrap').innerHTML = buildFooter();
+});
+
+async function submitForm() {
+  const name = document.getElementById('cName').value.trim();
+  const email = document.getElementById('cEmail').value.trim();
+  const subject = document.getElementById('cSubject').value;
+  const msg = document.getElementById('cMessage').value.trim();
+
+  // Hide all messages
+  document.getElementById('successMsg').style.display = 'none';
+  document.getElementById('errorMsg').style.display = 'none';
+  document.getElementById('rateLimitMsg').style.display = 'none';
+
+  // Validation
+  if (!name || !email || !msg) { showToast('Please fill all required fields.'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showToast('Please enter a valid email.'); return; }
+  if (msg.length < 10) { showToast('Message must be at least 10 characters.'); return; }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  document.getElementById('loadingMsg').style.display = 'block';
+
+  try {
+    const r = await fetch('/api/contact', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, subject, message: msg })
+    });
+    const d = await r.json();
+    if (r.ok && d.status === 'success') {
+      document.getElementById('successMsg').style.display = 'block';
+      document.getElementById('cName').value = '';
+      document.getElementById('cEmail').value = '';
+      document.getElementById('cMessage').value = '';
+      showToast('Message sent!');
+    } else if (r.status === 429) {
+      document.getElementById('rateLimitMsg').style.display = 'block';
+    } else {
+      throw new Error(d.detail || 'Failed');
+    }
+  } catch (e) {
+    document.getElementById('errorMsg').style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    document.getElementById('loadingMsg').style.display = 'none';
+  }
+}
+</script>
+</body>
+</html>
