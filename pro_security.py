@@ -292,6 +292,9 @@ class ProCSRFMiddleware(BaseHTTPMiddleware):
         is_protected = any(path.startswith(p) for p in CSRF_PROTECTED_PREFIXES)
         if not is_protected:
             return await call_next(request)
+                  # Login endpoint exempt — no session exists yet to carry CSRF token
+        if path == "/api/admin/login":
+            return await call_next(request)
 
         cookie_token = request.cookies.get("sfaam_csrf")
         header_token = request.headers.get("x-csrf-token")
