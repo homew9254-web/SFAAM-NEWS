@@ -238,7 +238,7 @@ class ProRateLimitMiddleware(BaseHTTPMiddleware):
 
 # Routes that require CSRF tokens. GET/HEAD/OPTIONS are always allowed.
 CSRF_PROTECTED_PREFIXES = (
-    "/api/admin/",
+    
     "/api/polls/",
     "/api/quiz/",
     "/api/comment",
